@@ -2,12 +2,12 @@
 
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle) [![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/SciMLStyle/stable/)
 
-The SciML Style Guide is a style guide for the Julia programming language. It is used by the [SciML Open Source Scientific Machine Learning Organization](https://sciml.ai/). As such, it is open to discussion with the community. Please file an issue or open a PR to discuss changes to the style guide.
+SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciML 开源科学机器学习组织](https://sciml.ai/) 使用。 因此，它向社区开放进行讨论。 请提交一个 issue 或开启一个 PR 来讨论对该风格指南的修改。
 
-**Table of Contents**
-- [SciML Style Guide for Julia](#sciml-style-guide-for-julia)
-  - [Code Style Badge](#code-style-badge)
-  - [Overarching Dogmas of the SciML Style](#overarching-dogmas-of-the-sciml-style)
+**目录**
+- [SciML Julia 风格指南](#sciml-style-guide-for-julia)
+  - [代码风格徽章](#code-style-badge)
+  - [SciML 风格的核心原则](#overarching-dogmas-of-the-sciml-style)
     - [Consistency vs Adherence](#consistency-vs-adherence)
     - [Community Contribution Guidelines](#community-contribution-guidelines)
     - [Open source contributions are allowed to start small and grow over time](#open-source-contributions-are-allowed-to-start-small-and-grow-over-time)
