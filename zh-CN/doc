@@ -2,92 +2,92 @@
 
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle) [![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/SciMLStyle/stable/)
 
-SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciML 开源科学机器学习组织](https://sciml.ai/) 使用。 因此，它向社区开放进行讨论。 请提交一个 issue 或开启一个 PR 来讨论对该风格指南的修改。
+SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciML 开源科学机器学习组织](https://sciml.ai/) 所使用。 因此，它在社区开放讨论。 请提交一个 issue 或开启一个 PR 来讨论对该风格指南的修改。
 
 **目录**
 - [SciML Julia 风格指南](#sciml-style-guide-for-julia)
   - [代码风格徽章](#code-style-badge)
-  - [SciML 风格的核心原则](#overarching-dogmas-of-the-sciml-style)
-    - [Consistency vs Adherence](#consistency-vs-adherence)
-    - [Community Contribution Guidelines](#community-contribution-guidelines)
-    - [Open source contributions are allowed to start small and grow over time](#open-source-contributions-are-allowed-to-start-small-and-grow-over-time)
-    - [Generic code is preferred unless code is known to be specific](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
-    - [Internal types should match the types used by users when possible](#internal-types-should-match-the-types-used-by-users-when-possible)
-    - [Trait definition and adherence to generic interface is preferred when possible](#trait-definition-and-adherence-to-generic-interface-is-preferred-when-possible)
-    - [Macros should be limited and only be used for syntactic sugar](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
-    - [Errors should be caught as high as possible, and error messages should be contextualized for newcomers](#errors-should-be-caught-as-high-as-possible-and-error-messages-should-be-contextualized-for-newcomers)
-    - [Subpackaging and interface packages is preferred over conditional modules via Requires.jl](#subpackaging-and-interface-packages-is-preferred-over-conditional-modules-via-requiresjl)
-    - [Functions should either attempt to be non-allocating and reuse caches, or treat inputs as immutable](#functions-should-either-attempt-to-be-non-allocating-and-reuse-caches-or-treat-inputs-as-immutable)
-    - [Out-Of-Place and Immutability is preferred when sufficient performant](#out-of-place-and-immutability-is-preferred-when-sufficient-performant)
-    - [Tests should attempt to cover a wide gamut of input types](#tests-should-attempt-to-cover-a-wide-gamut-of-input-types)
-    - [When in doubt, a submodule should become a subpackage or separate package](#when-in-doubt-a-submodule-should-become-a-subpackage-or-separate-package)
-    - [Globals should be avoided whenever possible](#globals-should-be-avoided-whenever-possible)
-    - [Type-stable and Type-grounded code is preferred wherever possible](#type-stable-and-type-grounded-code-is-preferred-wherever-possible)
-    - [Closures should be avoided whenever possible](#closures-should-be-avoided-whenever-possible)
-    - [Numerical functionality should use the appropriate generic numerical interfaces](#numerical-functionality-should-use-the-appropriate-generic-numerical-interfaces)
-    - [Functions should capture one underlying principle](#functions-should-capture-one-underlying-principle)
-    - [Internal choices should be exposed as options whenever possible](#internal-choices-should-be-exposed-as-options-whenever-possible)
-    - [Prefer code reuse over rewrites whenever possible](#prefer-code-reuse-over-rewrites-whenever-possible)
-    - [Prefer to not shadow functions](#prefer-to-not-shadow-functions)
-    - [Avoid unmaintained dependencies](#avoid-unmaintained-dependencies)
-  - [Specific Rules](#specific-rules)
-    - [High Level Rules](#high-level-rules)
-    - [General Naming Principles](#general-naming-principles)
-    - [Comments](#comments)
-    - [Modules](#modules)
-    - [Functions](#functions)
-    - [Function Argument Precedence](#function-argument-precedence)
-    - [Tests and Continuous Integration](#tests-and-continuous-integration)
-    - [Whitespace](#whitespace)
-    - [NamedTuples](#namedtuples)
-    - [Numbers](#numbers)
-    - [Ternary Operator](#ternary-operator)
-    - [For loops](#for-loops)
-    - [Function Type Annotations](#function-type-annotations)
-    - [Struct Type Annotations](#struct-type-annotations)
-    - [Macros](#macros)
-    - [Types and Type Annotations](#types-and-type-annotations)
-    - [Package version specifications](#package-version-specifications)
-    - [Documentation](#documentation)
-    - [Error Handling](#error-handling)
-    - [Arrays](#arrays)
-    - [Line Endings](#line-endings)
-    - [VS-Code Settings](#vs-code-settings)
+  - [SciML 风格的总体原则](#overarching-dogmas-of-the-sciml-style)
+    - [一致性与遵守](#consistency-vs-adherence)
+    - [社区贡献准则](#community-contribution-guidelines)
+    - [开源贡献：从一步到千里](#open-source-contributions-are-allowed-to-start-small-and-grow-over-time)
+    - [除非特定情况，使用通用的代码](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
+    - [尽可能使内部类型与用户使用的类型相匹配](#internal-types-should-match-the-types-used-by-users-when-possible)
+    - [尽可能使用 Trait 定义并遵循通用的接口](#trait-definition-and-adherence-to-generic-interface-is-preferred-when-possible)
+    - [应该限制使用宏，并只将其用于语法糖](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
+    - [尽可能捕获错误，并提供上下文信息以供参考](#errors-should-be-caught-as-high-as-possible-and-error-messages-should-be-contextualized-for-newcomers)
+    - [优先使用子包和接口包，而不是通过 Requires.jl 使用条件模块](#subpackaging-and-interface-packages-is-preferred-over-conditional-modules-via-requiresjl)
+    - [函数应该尽量避免分配内存并重复使用缓存，或者将输入视为不可变的](#functions-should-either-attempt-to-be-non-allocating-and-reuse-caches-or-treat-inputs-as-immutable)
+    - [在性能足够的情况下，优先选择 Out-Of-Place 和不可变性](#out-of-place-and-immutability-is-preferred-when-sufficient-performant)
+    - [测试应尽量覆盖广泛的输入类型范围](#tests-should-attempt-to-cover-a-wide-gamut-of-input-types)
+    - [当存在疑虑时，子模块应该成为子包或独立包](#when-in-doubt-a-submodule-should-become-a-subpackage-or-separate-package)
+    - [尽可能避免全局范围](#globals-should-be-avoided-whenever-possible)
+    - [尽可能保证类型稳定且基于类型编程](#type-stable-and-type-grounded-code-is-preferred-wherever-possible)
+    - [应尽量避免使用闭包](#closures-should-be-avoided-whenever-possible)
+    - [数值功能应使用适当的通用数值接口](#numerical-functionality-should-use-the-appropriate-generic-numerical-interfaces)
+    - [函数应该包含一项基本原则](#functions-should-capture-one-underlying-principle)
+    - [尽可能将内部选择作为选项暴露出来](#internal-choices-should-be-exposed-as-options-whenever-possible)
+    - [尽可能重复使用代码而不是重复编写代码](#prefer-code-reuse-over-rewrites-whenever-possible)
+    - [尽可能避免遮蔽函数](#prefer-to-not-shadow-functions)
+    - [不要使用已经不维护的依赖](#avoid-unmaintained-dependencies)
+  - [具体规则](#specific-rules)
+    - [首要规则](#high-level-rules)
+    - [通用命名原则](#general-naming-principles)
+    - [注释](#comments)
+    - [模块](#modules)
+    - [函数](#functions)
+    - [函数参数优先级](#function-argument-precedence)
+    - [测试与持续集成](#tests-and-continuous-integration)
+    - [空格](#whitespace)
+    - [命名元组](#namedtuples)
+    - [数值](#numbers)
+    - [三元操作符](#ternary-operator)
+    - [For 循环](#for-loops)
+    - [函数类型标记](#function-type-annotations)
+    - [结构类型标记](#struct-type-annotations)
+    - [宏](#macros)
+    - [类型与类型标记](#types-and-type-annotations)
+    - [软件包版本规范](#package-version-specifications)
+    - [文档](#documentation)
+    - [错误处理](#error-handling)
+    - [数组](#arrays)
+    - [行尾](#line-endings)
+    - [VS Code 设置](#vs-code-settings)
     - [JuliaFormatter](#juliaformatter)
-- [References](#references)
+- [参考](#references)
 
 
-## Code Style Badge
+## 代码风格徽章
 
-Let contributors know your project is following the SciML Style Guide by adding the badge to your `README.md`.
+通过在你的 `README.md` 文件加上该徽章来让你的贡献者知道你的项目遵循了 SciML 代码风格。
 
 ```md
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 ```
 
-## Overarching Dogmas of the SciML Style
+## SciML 风格的总体原则
 
-### Consistency vs Adherence
+### 一致性与遵守
 
-According to PEP8:
+正如 PEP8 所说：
 
-> A style guide is about consistency. Consistency with this style guide is important. Consistency within a project is more important. Consistency within one module or function is the most important.
+> 风格指南关注的是一致性。 与该风格指南保持一致非常重要。 在一个项目中保持一致性更为重要。 在一个模块或函数内保持一致性最为重要。
 
-> But most importantly: know when to be inconsistent -- sometimes the style guide just doesn't apply. When in doubt, use your best judgment. Look at other examples and decide what looks best. And don't hesitate to ask!
+> 但最重要的是：要知道何时可以不一致 —— 有时候风格指南并不适用。 当你有疑问时，请运用你的判断力。 看看其他的例子，决定哪个看起来最好。 不犹豫地向他人求助！
 
-Some code within the SciML organization is old, on life support, donated by researchers to be maintained. Consistency is the number one goal, so updating to match the style guide should happen on a repo-by-repo basis, i.e. do not update one file to match the style guide (leaving all other files behind).
+SciML 组织中的一些代码已经过时，处于维护状态，并由研究人员捐赠以进行维护。 一致性是首要目标，因此修改以符合风格指南的事，应该在整个仓库的基础上进行，不要仅更新一个文件以符合风格指南（而将其他文件保持不变）。
 
-### Community Contribution Guidelines
+### 社区贡献准则
 
-For a comprehensive set of community contribution guidelines, refer to [ColPrac](https://github.com/SciML/ColPrac). A relevant point to highlight PRs should do one thing. In the context of style, this means that PRs that update the style of a package's code should not be mixed with fundamental code contributions. This separation makes it easier to ensure that large style improvements are isolated from substantive (and potentially breaking) code changes.
+完整的社区贡献指南，请参考 [ColPrac](https://github.com/SciML/ColPrac)。 需要强调的一个相关要点是，一个 PR 应该只做一件事。 在风格上，这意味着更新软件包代码风格的 PR 不应与基本代码贡献混在一起。 这种分离使得更容易确保大规模的风格改进与实质性（可能引发破坏性）的代码更改相互独立。
 
-### Open source contributions are allowed to start small and grow over time
+### 开源贡献：从一步到千里
 
-If the standard for code contributions is that every PR needs to support every possible input type that anyone can think of, the barrier would be too high for newcomers. Instead, the principle is to be as correct as possible to begin with, and grow the generic support over time. All recommended functionality should be tested, and any known generality issues should be documented in an issue (and with a `@test_broken` test when possible). However, a function that is known to not be GPU-compatible is not grounds to block merging, rather it is encouraged for a follow-up PR to improve the general type support!
+如果代码贡献的标准是每个 PR 都需要支持任何人能想到的所有可能的输入类型，那对于新手来说门槛就太高了。 相反，原则是一开始就尽可能正确，并随着时间的推移逐渐增加其通用性。 所有推荐的功能都应该经过测试，并且任何已知的普遍性问题都应该在一个 issue 中进行记录（并在可能的情况下使用 @test_broken 测试）。 然而，已知不与 GPU 兼容的函数并不是阻碍代码合并的理由，相反，我们鼓励后续的 PR 来改进通用类型的支持！
 
-### Generic code is preferred unless code is known to be specific
+### 除非特定情况，使用通用的代码
 
-For example, the code:
+例如，请看如下代码：
 
 ```julia
 function f(A, B)
@@ -97,7 +97,7 @@ function f(A, B)
 end
 ```
 
-would not be preferred for two reasons. One is that it assumes `A` uses one-based indexing, which would fail in cases like [OffsetArrays](https://github.com/JuliaArrays/OffsetArrays.jl) and [FFTViews](https://github.com/JuliaArrays/FFTViews.jl). Another issue is that it requires indexing, while not all array types support indexing (for example, [CuArrays](https://github.com/JuliaGPU/CuArrays.jl)). A more generic and compatible implementation of this function would be to use broadcast, for example:
+出于两个原因，这种写法并不建议。 其中之一是，假定了 `A` 使用了基于单一索引的方法，而对于 [OffsetArrays](https://github.com/JuliaArrays/OffsetArrays.jl) 和 [FFTViews](https://github.com/JuliaArrays/FFTViews.jl) 的情况则会出现问题。 另外一个问题是，它需要索引，但并不是所有的数组类型都支持索引（例如 [CuArrays](https://github.com/JuliaGPU/CuArrays.jl)）。 更加通用且兼容性更好的实现方法是使用广播，例如：
 
 ```julia
 function f(A, B)
@@ -105,29 +105,29 @@ function f(A, B)
 end
 ```
 
-which would allow support for a wider variety of array types.
+这将支持更广泛的数组类型。
 
-### Internal types should match the types used by users when possible
+### 尽可能使内部类型与用户使用的类型相匹配
 
-If `f(A)` takes the input of some collections and computes an output from those collections, then it should be expected that if the user gives `A` as an `Array`, the computation should be done via `Array`s. If `A` was a `CuArray`, then it should be expected that the computation should be internally done using a `CuArray` (or appropriately error if not supported). For these reasons, constructing arrays via generic methods, like `similar(A)`, is preferred when writing `f` instead of using non-generic constructors like `Array(undef,size(A))` unless the function is documented as being non-generic.
+如果 `f(A)` 接受某些集合作为输入，并从这些集合计算输出，那么可以期望如果用户将 `A` 作为 `Array` 传递，计算应该通过 `Array` 进行。 如果 `A` 是 `CuArray`，那么计算应该在内部使用 `CuArray` 进行（或者在不支持的情况下适当抛出错误）。 出于这些原因，在编写 `f` 时，通过类似 `similar(A)` 的通用方法构建数组优于使用非通用构造函数，例如 `Array(undef,size(A))`，除非该函数被记为非通用。
 
-### Trait definition and adherence to generic interface is preferred when possible
+### 尽可能使用 Trait 定义并遵循通用的接口
 
-Julia provides many different interfaces, for example:
+Julia 提供了许多不同的接口，例如：
 
 - [Iteration](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-iteration)
 - [Indexing](https://docs.julialang.org/en/v1/manual/interfaces/#Indexing)
 - [Broadcast](https://docs.julialang.org/en/v1/manual/interfaces/#man-interfaces-broadcasting)
 
-Those interfaces should be followed when possible. For example, when defining broadcast overloads, one should implement a `BroadcastStyle` as suggested by the documentation instead of simply attempting to bypass the broadcast system via `copyto!` overloads.
+这些接口应该尽可能被遵循。 例如，在定义广播重载时，应按照文档建议实现 `BroadcastStyle`，而不仅仅尝试通过 `copyto!` 重载来绕过广播系统。
 
-When interface functions are missing, these should be added to Base Julia or an interface package, like [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl). Such traits should be declared and used when appropriate. For example, if a line of code requires mutation, the trait `ArrayInterface.ismutable(A)` should be checked before attempting to mutate, and informative error messages should be written to capture the immutable case (or, an alternative code that does not mutate should be given).
+当接口函数缺失时，这些函数应该添加到 Base Julia 或一个接口包，比如 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl)。 在适当的情况下，应声明并使用这些 traits。 例如，如果一行代码需要进行突变，应在尝试变化之前检查 trait `ArrayInterface.ismutable(A)`，并编写完善的错误消息来捕获其不可变的情况（或者提供一个不进行突变的替代代码）。
 
-One example of this principle is demonstrated in the generation of Jacobian matrices. In many scientific applications, one may wish to generate a Jacobian cache from the user's input `u0`. A naive way to generate this Jacobian is `J = similar(u0,length(u0),length(u0))`. However, this will generate a Jacobian `J` such that `J isa Matrix`.
+这一原则的一个例子就是 Jacobian 矩阵的生成。 在许多科研领域的应用程序，人们可能希望从用户输入的 `u0` 中生成 Jacobian 缓存。 生成 Jacobian 矩阵的一种天真的方法是 `J = similar(u0, length(u0), length(u0))`。 然而，这将生成一个 `J`，使得 `J` 是 `Matrix` 类型。
 
-### Macros should be limited and only be used for syntactic sugar
+### 应该限制使用宏，并只将其用于语法糖
 
-Macros define new syntax, and for this reason, they tend to be less composable than other coding styles and require prior familiarity to be easily understood. One principle to keep in mind is, "can the person reading the code easily picture what code is being generated?". For example, a user of Soss.jl may not know what code is being generated by:
+宏定义了新的语法，因此相对于其他编码风格，它们往往不太能组合，并且需要事先熟悉才能容易理解。 一个要记住的原则是：“读代码的人能否轻松地想象出生成的代码是什么？”。 例如，Soss.jl 的用户可能不知道以下代码生成了什么样的代码：
 
 ```julia
 @model (x, α) begin
@@ -140,14 +140,14 @@ Macros define new syntax, and for this reason, they tend to be less composable t
 end
 ```
 
-and thus using such a macro as the interface is not preferred when possible. However, a macro like [`@muladd`](https://github.com/SciML/MuladdMacro.jl) is trivial to picture on a code (it recursively transforms `a*b + c` to `muladd(a,b,c)` for more [accuracy and efficiency](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)), so using such a macro, for example:
+因此，不建议使用这样的宏作为接口。 然而，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它递归地将 `a*b + c` 转换为 `muladd(a,b,c)`，以提高[准确性和效率](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)），因此可以使用这样的宏，例如：
 
 ```julia
 julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a032 * k2)))
 :(k3 = f((muladd)(c3, dt, t), (muladd).(dt, (muladd).(a032, k2, (*).(a031, k1)), uprev)))
 ```
 
-is recommended. Some macros in this category are:
+这种写法是推荐的。 其中一些这类宏包括：
 
 - `@inbounds`
 - [`@muladd`](https://github.com/SciML/MuladdMacro.jl)
@@ -156,17 +156,17 @@ is recommended. Some macros in this category are:
 - `@.`
 - [`@..`](https://github.com/YingboMa/FastBroadcast.jl)
 
-Some performance macros, like `@simd`, `@threads`, or [`@turbo` from LoopVectorization.jl](https://github.com/JuliaSIMD/LoopVectorization.jl), make an exception in that their generated code may be foreign to many users. However, they still are classified as appropriate uses as they are syntactic sugar since they do (or should) not change the behavior of the program in measurable ways other than performance.
+一些性能宏，如 `@simd`、`@threads` 或者来自 LoopVectorization.jl 的 [`@turbo`](https://github.com/JuliaSIMD/LoopVectorization.jl)，在这方面有个例外，它们生成的代码可能对许多用户来说是陌生的。 然而，它们仍然被归类为适当的用法，因为它们只是语法糖，除了性能之外，它们不会（或者不应该）以可测定的方式改变程序的行为。
 
-### Errors should be caught as high as possible, and error messages should be contextualized for newcomers
+### 尽可能捕获错误，并提供上下文信息以供参考
 
-Whenever possible, defensive programming should be used to check for potential errors before they are encountered deeper within a package. For example, if one knows that `f(u0,p)` will error unless `u0` is the size of `p`, this should be caught at the start of the function to throw a domain specific error, for example "parameters and initial condition should be the same size".
+尽可能使用防御性编程在遇到潜在错误之前进行检查，以避免它们在包的更深层次出现。 例如，如果我们知道，除非 `u0` 的大小与 `p` 相同，否则 `f(u0,p)` 会出错，那么在函数的开始处应该捕获这个错误，并抛出一个特定作用域的错误，例如“参数和初始条件应该具有相同的大小”。
 
-This contextualization should result in error messages that use terminology related to the user facing API (vs. referencing internal implementation details).  Ideally, such error messages should not only describe the issue in language that will be familiar to the user but also include suggestions, where possible, of how to correct the issue.
+错误信息的上下文应该使用与用户界面 API 相关的术语（而不是引用内部实现细节）。  理想情况下，这样的错误消息不仅应该用用户熟悉的语言描述问题，而且在可能的情况下，还应包含如何纠正问题的建议。
 
-### Subpackaging and interface packages is preferred over conditional modules via Requires.jl
+### 优先使用子包和接口包，而不是通过 Requires.jl 使用条件模块
 
-Requires.jl should be avoided at all costs. If an interface package exists, such as [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) for defining automatic differentiation rules without requiring a dependency on the whole ChainRules.jl system, or [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) which allows for defining Plots.jl plot recipes without a dependency on Plots.jl, a direct dependency on these interface packages is preferred.
+应该不惜一切代价避免使用 Requireres.jl。 If an interface package exists, such as [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) for defining automatic differentiation rules without requiring a dependency on the whole ChainRules.jl system, or [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) which allows for defining Plots.jl plot recipes without a dependency on Plots.jl, a direct dependency on these interface packages is preferred.
 
 Otherwise, instead of resorting to a conditional dependency using Requires.jl, it is preferred to create subpackages, i.e. smaller independent packages kept within the same Github repository with independent versioning and package management. An example of this is seen in [Optimization.jl](https://github.com/SciML/Optimization.jl) which has subpackages like [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) for BlackBoxOptim.jl support.
 
