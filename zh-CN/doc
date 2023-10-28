@@ -166,11 +166,11 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 ### 优先使用子包和接口包，而不是通过 Requires.jl 使用条件模块
 
-应该不惜一切代价避免使用 Requireres.jl。 If an interface package exists, such as [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) for defining automatic differentiation rules without requiring a dependency on the whole ChainRules.jl system, or [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) which allows for defining Plots.jl plot recipes without a dependency on Plots.jl, a direct dependency on these interface packages is preferred.
+应该不惜一切代价避免使用 Requireres.jl。 如果存在接口包，例如用于定义自动微分规则而无需依赖整个 ChainRules.jl 系统的 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)，或者用于定义 Plots.jl 绘图方式而无需依赖 Plots.jl 的 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl)，则更倾向于直接依赖这种接口包。
 
-Otherwise, instead of resorting to a conditional dependency using Requires.jl, it is preferred to create subpackages, i.e. smaller independent packages kept within the same Github repository with independent versioning and package management. An example of this is seen in [Optimization.jl](https://github.com/SciML/Optimization.jl) which has subpackages like [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) for BlackBoxOptim.jl support.
+否则，与其使用 Requires.jl 进行条件依赖，更倾向于创建子软件包，即在同一 GitHub 仓库中保留的较小的独立软件包，具有独立的版本控制和软件包管理。 这一点可以在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中看到，它有像 [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
 
-Some important interface packages to know about are:
+需要了解的一些重要接口包有：
 
 - [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)
 - [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl)
@@ -178,19 +178,19 @@ Some important interface packages to know about are:
 - [CommonSolve.jl](https://github.com/SciML/CommonSolve.jl)
 - [SciMLBase.jl](https://github.com/SciML/SciMLBase.jl)
 
-### Functions should either attempt to be non-allocating and reuse caches, or treat inputs as immutable
+### 函数应该尽量避免分配内存并重复使用缓存，或者将输入视为不可变的
 
-Mutating codes and non-mutating codes fall into different worlds. When a code is fully immutable, the compiler can better reason about dependencies, optimize the code, and check for correctness. However, many times a code that makes the fullest use of mutation can outperform even what the best compilers of today can generate. That said, the worst of all worlds is when code mixes mutation with non-mutating code. Not only is this a mishmash of coding styles, but it also has the potential non-locality and compiler proof issues of mutating code while not fully benefiting from the mutation.
+可变代码和不可变代码属于完全不同的世界。 当代码完全不可变时，编译器可以更好地跟踪依赖关系，优化代码，并检查其是否正确。 然而，很多时候，充分利用可变的代码甚至可以超越当今最好的编译器所生成的代码。 话虽如此，最糟糕的情况就是将可变代码与不可变代码混在一起。 这不仅是一种编码风格的混合，还可能导致潜在的非局部性和编译器校验问题，因为它在不充分利用可变性的同时进行了可变代码的编写。
 
-### Out-Of-Place and Immutability is preferred when sufficient performant
+### 在性能足够的情况下，优先选择 Out-Of-Place 和不可变性
 
-Mutation is used to get more performance by decreasing the number of heap allocations. However, if it's not helpful for heap allocations in a given spot, do not use mutation. Mutation is scary and should be avoided unless it gives an immediate benefit. For example, if matrices are sufficiently large, then `A*B` is as fast as `mul!(C,A,B)`, and thus writing `A*B` is preferred (unless the rest of the function is being careful about being fully non-allocating, in which case this should be `mul!` for consistency).
+通过减少堆分配的数量，可变性可以提高性能。 然而，如果对于给定点的堆分配没有好处，那么就不要使用可变性。 除非可变性可以带来直接的好处，不然这些可怕的可变性应该尽可能避免。 例如，如果矩阵足够大，那么 `A*B` 的速度与 `mul!(C,A,B)` 是相当的，因此，更倾向于编写 `A*B`（除非函数的其余部分很注重完全的非内存分配，为了一致性就应该使用 `mul!`）。
 
-Similarly, when defining types, using `struct` is preferred to `mutable struct` unless mutating the struct is a common occurrence. Even if mutating the struct is a common occurrence, see whether using [Setfield.jl](https://github.com/jw3126/Setfield.jl) is sufficient. The compiler will optimize the construction of immutable structs, and thus this can be more efficient if it's not too much of a code hassle.
+类似地，在定义类型时，除非结构体的变化是普遍的，否则更倾向于使用 `struct` 而不是 `mutable struct`。 即使结构体的变化是常见情况，也要看看是否可以仅使用 [Setfield.jl](https://github.com/jw3126/Setfield.jl) 来实现。 编译器会对不可变结构体的构建进行优化，因此如果这么写不会太麻烦，代码会更加高效。
 
-### Tests should attempt to cover a wide gamut of input types
+### 测试应尽量覆盖广泛的输入类型范围
 
-Code coverage numbers are meaningless if one does not consider the input types. For example, one can hit all the code with `Array`, but that does not test whether `CuArray` is compatible! Thus it's always good to think of coverage not in terms of lines of code but in terms of type coverage. A good list of number types to think about are:
+如果不考虑输入类型，代码覆盖率数字就毫无意义。 例如，可以使用 `Array` 覆盖所有代码，但这并不能确认 `CuArray` 是否兼容！ 因此，应该将类型覆盖率作为代码覆盖率的重要部分，而不是仅仅关注代码行数。 对于数值，以下几种类型最好是要考虑的：
 
 - `Float64`
 - `Float32`
@@ -198,58 +198,58 @@ Code coverage numbers are meaningless if one does not consider the input types. 
 - [`Dual`](https://github.com/JuliaDiff/ForwardDiff.jl)
 - `BigFloat`
 
-Array types to think about testing are:
+对于数组则是：
 
 - `Array`
 - [`OffsetArray`](https://github.com/JuliaArrays/OffsetArrays.jl)
 - [`CuArray`](https://github.com/JuliaGPU/CUDA.jl)
 
-### When in doubt, a submodule should become a subpackage or separate package
+### 当存在疑虑时，子模块应该成为子包或独立包
 
-Keep packages focused on one core idea. If there's something separate enough to be a submodule, could it instead be a separate, well-tested and documented package to be used by other packages? Most likely yes.
+一个包应该只集中在做好一件事情。 如果有些代码足够独立，以至于可以作为一个子模块，那么是否可以将它们独立出来，进行全面的测试并编写文档，以便其他的包使用？ 大多数情况下，是的。
 
-### Globals should be avoided whenever possible
+### 尽可能避免全局范围
 
-Global variables should be avoided whenever possible. When required, global variables should be constants and have an all uppercase name separated with underscores (e.g. `MY_CONSTANT`). They should be defined at the top of the file, immediately after imports and exports but before an `__init__` function. If you truly want mutable global style behavior you may want to look into mutable containers.
+应该尽可能避免使用全局变量。 一定需要时，全局变量应该是常量，并且用下划线隔开的大写字母命名（例如，`MY_CONSTANT`）。 它们需要在文件的开始，在导入和导出之后，`__init__` 函数之前被定义。 如果你真的希望使用可变的全局行为，你可能需要考虑使用可变容器。
 
-### Type-stable and Type-grounded code is preferred wherever possible
+### 尽可能保证类型稳定且基于类型编程
 
-Type-stable and type-grounded code helps the compiler create not only more optimized code, but also faster to compile code. Always keep containers well-typed, functions specializing on the appropriate arguments, and types concrete.
+类型的稳定以及基于类型的编写的代码，不仅可以使编译器生成高度优化的代码，同时可以提高编译速度。 始终保持容器具有良好的类型定义，函数只专注于适当的参数，并确保类型具体明确。
 
-### Closures should be avoided whenever possible
+### 应尽量避免使用闭包
 
-Closures can cause accidental type instabilities that are difficult to track down and debug; in the long run, it saves time to always program defensively and avoid writing closures in the first place, even when a particular closure would not have been problematic. A similar argument applies to reading code with closures; if someone is looking for type instabilities, this is faster to do when code does not contain closures. Furthermore, if you want to update variables in an outer scope, do so explicitly with `Ref`s or self defined structs. For example,
+闭包可能会导致难以追踪和调试的类型不稳定性；从长远来看，以防御性编程为准则，并在首次编写代码时避免使用闭包。即使某个闭包可能并不会引起问题，这样做也能节省时间。 类似的论点也适用于阅读带有闭包的代码；如果有人正在寻找类型不稳定性，不含闭包的代码更方便搜查。 此外，如果你想要在外部作用域中更新变量，可以明确地使用 `Ref` 或自定义的结构体来实现。 例如：
 ```julia
 map(Base.Fix2(getindex, i), vector_of_vectors)
 ```
-is preferred over
+该写法比以下两种写法要好：
 ```julia
 map(v -> v[i], vector_of_vectors)
 ```
-or
+或
 ```julia
 [v[i] for v in vector_of_vectors]
 ```
 
-### Numerical functionality should use the appropriate generic numerical interfaces
+### 数值功能应使用适当的通用数值接口
 
-While you can use `A\b` to do a linear solve inside a package, that does not mean that you should. This interface is only sufficient for performing factorizations, and so that limits the scaling choices, the types of `A` that can be supported, etc. Instead, linear solves within packages should use LinearSolve.jl. Similarly, nonlinear solves should use NonlinearSolve.jl. Optimization should use Optimization.jl. Etc. This allows the full generic choice to be given to the user without depending on every solver package (effectively recreating the generic interfaces within each package).
+虽然你可以在包内使用 `A\b` 进行线性求解，但这并不意味着你应该这样做。 这个接口仅适用于执行因式分解，因此降低了可扩展性、以及 `A` 的类型的兼容性。 相反，在软件包内的进行线性解析，应该使用 LinearSolve.jl。 同样的，非线性解析应该使用 NonlinearSolve.jl。 编码优化应该使用 Optimization.jl。 诸如此类。 这样可以将完全通用的选择权交给用户，而无需依赖每个求解器包（在每个包内重新创建通用接口）。
 
-### Functions should capture one underlying principle
+### 函数应该包含一项基本原则
 
-Functions mean one thing. Every dispatch of `+` should be "the meaning of addition on these types". While in theory you could add dispatches to `+` that mean something different, that will fail in generic code for which `+` means addition. Thus, for generic code to work, code needs to adhere to one meaning for each function. Every dispatch should be an instantiation of that meaning.
+函数意味着一件事。 每次调用 `+` 都代表着“在这些类型上做加法”。 虽然理论上你可以添加不同含义的 `+` 用法，但在以 `+` 表示加法的通用代码中，这会造成错误。 为了使通用代码正常工作，代码需要遵循每个函数的一个含义。 每次调用都应该是该含义的一个实例化。
 
-### Internal choices should be exposed as options whenever possible
+### 尽可能将内部选择作为选项暴露出来
 
-Whenever possible, numerical values and choices within scripts should be exposed as options to the user. This promotes code reusability beyond the few cases the author may have expected.
+在可能的情况下，脚本中的数值和选择应该作为选项向用户公开。 在超出作者预期的一些情况下，这可以提高代码的可重复使用性。
 
-### Prefer code reuse over rewrites whenever possible
+### 尽可能重复使用代码而不是重复编写代码
 
-If a package has a function you need, use the package. Add a dependency if you need to. If the function is missing a feature, prefer to add that feature to said package and then add it as a dependency. If the dependency is potentially troublesome, for example because it has a high load time, prefer to spend time helping said package fix these issues and add the dependency. Only when it does not seem possible to make the package "good enough" should using the package be abandoned. If it is abandoned, consider building a new package for this functionality as you need it, and then make it a dependency.
+如果一个软件包里含有一个你需要的函数，请使用软件包。 在需要的时候添加一个依赖。 如果函数缺少一个功能，倾向于使用这样的软件包作为依赖来实现。 如果这个依赖有一些潜在的问题，比如它的加载时间很长，考虑花一些时间帮助该软件包解决这些问题，最后再作为依赖。 只有你不可能帮助这个包变得“足够好”的情况下，你才应该放弃使用它。 如果你放弃了这个包，你可以考虑为你所需要的功能构建一个新的软件包，并使它可以成为其他项目的一个依赖。
 
-### Prefer to not shadow functions
+### 尽可能避免遮蔽函数
 
-Two functions can have the same name in Julia by having different namespaces. For example, `X.f` and `Y.f` can be two different functions, with different dispatches, but the same name. This should be avoided whenever possible. Instead of creating `MyPackage.sort`, consider adding dispatches to `Base.sort` for your types if these new dispatches match the underlying principle of the function. If it doesn't, prefer to use a different name. While using `MyPackage.sort` is not conflicting, it is going to be confusing for most people unfamiliar with your code, so `MyPackage.special_sort` would be more helpful to newcomers reading the code.
+在 Julia 中，两个函数可以通过不同的命名空间来使用相同的函数名。 例如，`X.f` 和 `Y.f` 可以是两个不同的函数，具有不同的调用方式，但名称却相同。 当然，这种情况应该尽可能避免。 Instead of creating `MyPackage.sort`, consider adding dispatches to `Base.sort` for your types if these new dispatches match the underlying principle of the function. If it doesn't, prefer to use a different name. While using `MyPackage.sort` is not conflicting, it is going to be confusing for most people unfamiliar with your code, so `MyPackage.special_sort` would be more helpful to newcomers reading the code.
 
 ### Avoid unmaintained dependencies
 
