@@ -8,11 +8,11 @@ SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciM
 - [SciML Julia 风格指南](#sciml-style-guide-for-julia)
   - [代码风格徽章](#code-style-badge)
   - [SciML 风格的总体原则](#overarching-dogmas-of-the-sciml-style)
-    - [一致性与遵守](#consistency-vs-adherence)
+    - [一致性与约定](#consistency-vs-adherence)
     - [社区贡献准则](#community-contribution-guidelines)
-    - [开源贡献：从一步到千里](#open-source-contributions-are-allowed-to-start-small-and-grow-over-time)
-    - [除非特定情况，使用通用的代码](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
-    - [尽可能使内部类型与用户使用的类型相匹配](#internal-types-should-match-the-types-used-by-users-when-possible)
+    - [开源贡献是从小到大的历练](#open-source-contributions-are-allowed-to-start-small-and-grow-over-time)
+    - [使用通用化的代码](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
+    - [尽量匹配用户使用的类型](#internal-types-should-match-the-types-used-by-users-when-possible)
     - [尽可能使用 Trait 定义并遵循通用的接口](#trait-definition-and-adherence-to-generic-interface-is-preferred-when-possible)
     - [应该限制使用宏，并只将其用于语法糖](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
     - [尽可能捕获错误，并提供上下文信息以供参考](#errors-should-be-caught-as-high-as-possible-and-error-messages-should-be-contextualized-for-newcomers)
@@ -249,40 +249,40 @@ map(v -> v[i], vector_of_vectors)
 
 ### 尽可能避免遮蔽函数
 
-在 Julia 中，两个函数可以通过不同的命名空间来使用相同的函数名。 例如，`X.f` 和 `Y.f` 可以是两个不同的函数，具有不同的调用方式，但名称却相同。 当然，这种情况应该尽可能避免。 Instead of creating `MyPackage.sort`, consider adding dispatches to `Base.sort` for your types if these new dispatches match the underlying principle of the function. If it doesn't, prefer to use a different name. While using `MyPackage.sort` is not conflicting, it is going to be confusing for most people unfamiliar with your code, so `MyPackage.special_sort` would be more helpful to newcomers reading the code.
+在 Julia 中，两个函数可以通过不同的命名空间来使用相同的函数名。 例如，`X.f` 和 `Y.f` 可以是两个不同的函数，具有不同的调用方式，但名称却相同。 当然，这种情况应该尽可能避免。 比起创建一个 `MyPackage.sort`，在你想要添加的新用法符合基本函数的原则时，你应该为你的类型将这些用法添加到 `Base.sort` 中。 如果不是，考虑使用不同的函数名称。 虽然使用 `MyPackage.sort` 并不会产生冲突，但对于大多数不熟悉你的代码的人来说，这可能会令人困惑，因此考虑到一些阅读代码的新手，使用 `MyPackage.special_sort` 会更方便他人熟悉。
 
-### Avoid unmaintained dependencies
+### 不要使用已经不维护的依赖
 
-Packages should only be depended on if they have maintainers who are responsive. Good code requires good communities. If maintainers do not respond to breakage within 2 weeks with multiple notices, then all dependencies from that organization should be considered for removal. Note that some issues may take a long time to fix, so it may take more time than 2 weeks to fix, it's simply that the communication should be open, consistent, and timely.
+只有当包的维护者能够及时作出响应时，才应该依赖于这些包。 好的代码需要好的社区。 如果它的维护者在被多次提醒时，两周内仍未对问题做出回应，那么应考虑移除依赖性中所有该组织的包。 注意，有些问题可能需要远超过两周时间才能解决，重要的是保持沟通的开放性、一致性和及时性。
 
-## Specific Rules
+## 具体规则
 
-### High Level Rules
+### 首要规则
 
-- Use 4 spaces per indentation level, no tabs.
-- Try to adhere to a 92 character line length limit.
+- 使用 4 个空格缩进，不使用 Tab。
+- 尝试保证每行的字符在 92 个之内。
 
-### General Naming Principles
+### 通用命名原则
 
-- All type names should be `CamelCase`.
-- All struct names should be `CamelCase`.
-- All module names should be `CamelCase`.
-- All function names should be `snake_case` (all lowercase).
-- All variable names should be `snake_case` (all lowercase).
-- All constant names should be `SNAKE_CASE` (all uppercase).
-- All abstract type names should begin with `Abstract`.
-- All type variable names should be a single capital letter, preferably related to the value being typed.
-- Whole words are usually better than abbreviations or single letters.
-- Variables meant to be internal or private to a package should be denoted by prepending two underscores, i.e. `__`.
-- Single letters can be okay when naming a mathematical entity, i.e. an entity whose purpose or non-mathematical "meaning" is likely only known by downstream callers. For example, `a` and `b` would be appropriate names when implementing `*(a::AbstractMatrix, b::AbstractMatrix)`, since the "meaning" of those arguments (beyond their mathematical meaning as matrices, which is already described by the type) is only known by the caller.
-- Unicode is fine within code where it increases legibility, but in no case should Unicode be used in public APIs. This is to allow support for terminals that cannot use Unicode: if a keyword argument must be η, then it can be exclusionary to uses on clusters which do not support Unicode inputs.
+- 所有的类型名称都应该是 `CamelCase`。
+- 所有的结构名称都应该是 `CamelCase`。
+- 所有的模块名称都应该是 `CamelCase`。
+- 所有的函数名称都应该是 `snake_case`（全部小写）。
+- 所有的变量名称都应该是 `snake_case`（全部小写）。
+- 所有的常量名称都应该是 `snake_case`（全部小写）。
+- 所有抽象类型名称都应该以 `Abstract` 开头。
+- 所有类型的变量名称应只有一个大写字母，词义最好与所表示的值相关联。
+- 整个单词通常要比使用缩写和单个字母好。
+- 用于表示包内部或私有的变量应该以两个下划线作为前缀，即 `__`。
+- 在为数学实体命名时，使用单个字母可能是可以接受的，即该实体的目的或非数学的“含义”可能只有下游调用者知道。 例如，在实现 `*(a::AbstractMatrix, b::AbstractMatrix)` 时，名称 `a` 和 `b` 是合适的，因为这些参数的“含义”（除了它们作为矩阵的数学含义，已经由类型描述）只有调用者知道。
+- 在代码中使用 Unicode 来提高可读性是可以的，但在任何情况下，都不应该在公共 API 中使用 Unicode。 这是为了支持无法使用 Unicode 的终端而设定的：如果一个关键字参数必须是 η，那么在不支持 Unicode 输入的集群上使用它可能会被排除。
 
-### Comments
+### 注释
 
-- `TODO` to mark todo comments and `XXX` to mark comments about currently broken code
-- Quote code in comments using backticks (e.g. `` `variable_name` ``).
-- When possible, code should be changed to incorporate information that would have been in a comment. For example, instead of commenting `# fx applies the effects to a tree`, simply change the function and variable names `apply_effects(tree)`.
-- Comments referring to Github issues and PRs should add the URL in the comments. Only use inline comments if they fit within the line length limit. If your comment cannot be fitted inline, then place the comment above the content to which it refers:
+- 使用 `TODO` 来标记待办注释，使用 `XXX` 来标记对当前有问题代码的注释。
+- 在注释中使用反引号（例如，`` `variable_name` ``）引用代码。
+- 如果可能的话，应该修改部分代码以包含本会在注释中体现的信息。 比如，比起使用 `# fx applies the effects to a tree`，仅仅把函数名改为 `apply_effects(tree)` 就足够了。
+- 指向 GitHub issues 和 PRs 的注释应该包含对应的 URL。 只有当内联注释符合行长度限制时才使用内联注释。 如果你的注释无法放在一行内，那么将注释放置在所涉及内容的上方：
 
 ```julia
 # Yes:
@@ -297,13 +297,13 @@ p = 1  # Number of nodes to predict. Again, an issue with the workflow order. Sh
 # updated after data is fetched.
 ```
 
-- In general, comments above a line of code or function are preferred to inline comments.
+- 一般而言，我们更倾向于将注释放置在代码行或函数之上，而非使用内联注释。
 
-### Modules
+### 模块
 
-- Module imports should occur at the top of a file or right after a `module` declaration.
-- Module imports in packages should either use `import` or explicitly declare the imported functionality, for example `using Dates: Year, Month, Week, Day, Hour, Minute, Second, Millisecond`.
-- Import and using statements should be separated, and should be divided by a blank line.
+- 模块应该在文件的开头或在一个 `module` 的定义后导入。
+- 在包中，模块导入应该使用 `import` 关键字或明确声明导入的功能，例如 `using Dates: Year, Month, Week, Day, Hour, Minute, Second, Millisecond`。
+- `import` 和 `using` 语句应该分开，并用一个空行分隔。
 
 ```julia
 # Yes:
@@ -320,7 +320,7 @@ import C
 using D: d
 ```
 
-- Large sets of imports are preferred to be written in space filling lines separated by commas.
+- 大量的导入项应该在行内使用逗号分隔编写。
 
 ```julia
 # Yes:
@@ -339,10 +339,10 @@ using A,
       D
 ```
 
-- Exported variables should be considered part of the public API, and changing their interface constitutes a breaking change.
-- Any exported variables should be sufficiently unique. I.e., do not export `f` as that is very likely to clash with something else.
-- A file that includes the definition of a module, should not include any other code that runs outside that module. i.e. the module should be declared at the top of the file with the `module` keyword and `end` at the bottom of the file. No other code before, or after (except for module docstring before). In this case, the code within the module block should **not** be indented.
-- Sometimes, e.g. for tests, or for namespacing an enumeration, it *is* desirable to declare a submodule midway through a file. In this case, the code within the submodule **should** be indented.
+- 导出的变量应该被视为公共 API 的一部分，对它们的接口的改变视为破坏性改动。
+- 任何导出变量都应该是唯一的。 换句话说，不要导出如 `f` 这样的名称，这很可能与其他代码发生冲突。
+- 包含模块定义的文件不应包含任何在该模块之外运行的其他代码。 也就是说，该模块应在文件顶部使用关键字 `module` 声明，并在文件底部使用 `end` 结束。 除了模块文档字符串之前的部分，不应该有其他代码出现在其前后。 在这种情况下，模块块内的代码应该**不**缩进。
+- 有时候，例如用于测试或为了给枚举命名空间，希望在文件的中部声明一个子模块。 在这种情况下，模块块内的代码应该**应该**缩进。
 
 ### Functions
 
