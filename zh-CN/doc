@@ -166,11 +166,11 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 ### 优先使用子包和接口包，而不是 Requires.jl
 
-想方设法不要使用 Requires.jl。 如果存在接口包，例如用于定义自动微分规则而无需依赖整个 ChainRules.jl 系统的 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)，或者用于定义 Plots.jl 绘图方式而无需依赖 Plots.jl 的 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl)，则更倾向于直接依赖这种接口包。
+尽可能地避免使用 Requires.jl。 倾向于使用你需要的某个特定的接口包。例如，要定义自动微分规则，你只需要依赖 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) 而不用依赖整个 ChainRules.jl 系统；要定义 Plots.jl 的 recipes 你只需要使用 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) 而不用使用整个 Plots.jl。
 
-否则，与其使用 Requires.jl 进行条件依赖，更倾向于创建子软件包，即在同一 GitHub 仓库中保留的较小的独立软件包，具有独立的版本控制和软件包管理。 这一点可以在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中看到，它有像 [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
+否则，比起使用 Requires.jl 进行条件依赖，你应该创建一个子软件包；换句话说，在同一个 GitHub 仓库里保存一份具有独立版本控制和包管理的独立软件包。 例如，在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中，[OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
 
-需要了解的一些重要接口包有：
+一些你最好要知道的接口包有：
 
 - [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)
 - [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl)
@@ -178,19 +178,19 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 - [CommonSolve.jl](https://github.com/SciML/CommonSolve.jl)
 - [SciMLBase.jl](https://github.com/SciML/SciMLBase.jl)
 
-### 函数应该尽量避免分配内存并重复使用缓存，或者将输入视为不可变的
+### 函数应减少分配内存并重用缓存，或使用不可变的输入
 
-可变代码和不可变代码属于完全不同的世界。 当代码完全不可变时，编译器可以更好地跟踪依赖关系，优化代码，并检查其是否正确。 然而，很多时候，充分利用可变的代码甚至可以超越当今最好的编译器所生成的代码。 话虽如此，最糟糕的情况就是将可变代码与不可变代码混在一起。 这不仅是一种编码风格的混合，还可能导致潜在的非局部性和编译器校验问题，因为它在不充分利用可变性的同时进行了可变代码的编写。
+可变（Mutating）代码和不可变（Non-Mutating）代码仿佛是两个完全不同的世界。 当你的代码完全不可变（Immutable）时，编译器可以更好的推断依赖关系，优化代码并检查错误。 然而有些时候，充分利用可变（Mutation）的代码，甚至可以超越当今最好的编译器所生成的代码。 尽管如此，当你混合两种模式的代码时，结果会变得很糟糕。 这不只仅仅是一种编码风格的混合，还会导致潜在的非局部性（Non-locality）和编译器校验问题，这是因为这些代码没有充分利用好可变性。
 
-### 在性能足够的情况下，优先选择 Out-Of-Place 和不可变性
+### 性能足够高时，首选 Out-of-Place 和不可变性的写法
 
-通过减少堆分配的数量，可变性可以提高性能。 然而，如果对于给定点的堆分配没有好处，那么就不要使用可变性。 除非可变性可以带来直接的好处，不然这些可怕的可变性应该尽可能避免。 例如，如果矩阵足够大，那么 `A*B` 的速度与 `mul!(C,A,B)` 是相当的，因此，更倾向于编写 `A*B`（除非函数的其余部分很注重完全的非内存分配，为了一致性就应该使用 `mul!`）。
+可变性（Mutation）可以通过减少堆的分配（Heap Allocations）来提高性能， 然而，在特定情况下，如果进行堆的分配没有帮助，就不要使用可变性（Mutation）写法， 除非可变性可以带来立竿见影的效果。 例如，在矩阵足够大的情况下，`A*B` 与 `mul!(C,A,B)` 的速度是相当的，此时，更倾向于编写 `A*B`（除非函数的其他部分严格地不进行内存分配，为了一致性就应该写作 `mul!`）。
 
-类似地，在定义类型时，除非结构体的变化是普遍的，否则更倾向于使用 `struct` 而不是 `mutable struct`。 即使结构体的变化是常见情况，也要看看是否可以仅使用 [Setfield.jl](https://github.com/jw3126/Setfield.jl) 来实现。 编译器会对不可变结构体的构建进行优化，因此如果这么写不会太麻烦，代码会更加高效。
+类似的，除非结构（Struct）的变化是普遍需要的，否则更倾向于使用 `struct` 而不是 `mutable struct`； 即使结构（Struct）的变化是普遍的，你也要尽可能使用 [Setfield.jl](https://github.com/jw3126/Setfield.jl) 来实现。 因为编译器会对不可变（Immutable）的结构进行优化，所以不嫌麻烦的话，尽可能书写不可变的代码，这使得你的程序更加高效。
 
-### 测试应尽量覆盖广泛的输入类型范围
+### 测试应该囊括尽可能多的输入类型
 
-如果不考虑输入类型，代码覆盖率数字就毫无意义。 例如，可以使用 `Array` 覆盖所有代码，但这并不能确认 `CuArray` 是否兼容！ 因此，应该将类型覆盖率作为代码覆盖率的重要部分，而不是仅仅关注代码行数。 对于数值，以下几种类型最好是要考虑的：
+如果不考虑输入类型，代码覆盖率的数字就毫无意义。 例如，你可以使用 `Array` 覆盖所有代码，但这不会检测 `CuArray` 的兼容性。 因此，应该将类型覆盖率作为代码覆盖率的重要部分，而不是仅仅关注代码行数。 对于数值，以下几种类型最好是要考虑的：
 
 - `Float64`
 - `Float32`
@@ -204,7 +204,7 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 - [`OffsetArray`](https://github.com/JuliaArrays/OffsetArrays.jl)
 - [`CuArray`](https://github.com/JuliaGPU/CUDA.jl)
 
-### 当存在疑虑时，子模块应该成为子包或独立包
+### 子模块应该适时改写为子包或独立包
 
 一个包应该只集中在做好一件事情。 如果有些代码足够独立，以至于可以作为一个子模块，那么是否可以将它们独立出来，进行全面的测试并编写文档，以便其他的包使用？ 大多数情况下，是的。
 
