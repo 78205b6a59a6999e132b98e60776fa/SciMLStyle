@@ -344,9 +344,9 @@ using A,
 - 包含模块定义的文件不应包含任何在该模块之外运行的代码。 也就是说，该模块应在文件开始使用关键字 `module` 声明，并在文件底部使用 `end` 结尾。 除可能存在的模块之前的文档字符外，模块的前后不应该有其他代码。 在这种情况下，模块的块内代码应该**不**缩进。
 - 某些时候出于测试或为了给枚举命名空间，需要在文件的中部声明一个子模块。 在这种情况下，模块的块内代码应该**应该**缩进。
 
-### Functions
+### 函数
 
-- Only use short-form function definitions when they fit on a single line:
+- 当函数适合写在一行内时使用短函数（Short-form Function）形式。
 
 ```julia
 # Yes:
@@ -358,7 +358,7 @@ foobar(array_data::AbstractArray{T}, item::T) where {T <: Int64} = T[
 ]
 ```
 
-- Inputs should be required unless a default is historically expected or likely to be applicable to >95% of use cases. For example, the tolerance of a differential equation solver was set to a default of `abstol=1e-6,reltol=1e-3` as a generally correct plot in most cases, and is an expectation from back in the 90's. In that case, using the historically expected and most often useful default tolerances is justified. However, if one implements `GradientDescent`, the learning rate needs to be adjusted for each application (based on the size of the gradient), and thus a default of `GradientDescent(learning_rate = 1)` is not recommended.
+- 函数应该要求输入参数，除非提供的默认值在历史上广受认可，或在 95% 以上的情况下都是合适的。 例如，大多数情况下，微分方程求解器的容差默认值为 `abstol=1e-6、reltol=1e-3`，这是从 90 年代开始就普遍认可的绘图参数。 In that case, using the historically expected and most often useful default tolerances is justified. However, if one implements `GradientDescent`, the learning rate needs to be adjusted for each application (based on the size of the gradient), and thus a default of `GradientDescent(learning_rate = 1)` is not recommended.
 - Arguments that do not have defaults should preferably be made into positional arguments. The newer syntax of required keyword arguments can be useful, but should not be abused. Notable exceptions are cases where "either or" arguments are accepted, for example, if defining `g` or `dgdu` is sufficient, then making them both keyword arguments with `= nothing` and checking that either is not `nothing` (and throwing an appropriate error) is recommended if distinct dispatches with different types is not possible.
 - When calling a function, always separate your keyword arguments from your positional arguments with a semicolon. This avoids mistakes in ambiguous cases (such as splatting a Dict).
 - When writing a function that sends a lot of keyword arguments to another function, say sending keyword arguments to a differential equation solver, use a named tuple keyword argument instead of splatting the keyword arguments. For example, use `diffeq_solver_kwargs = (; abstol=1e-6, reltol=1e-6,)` as the API and use `solve(prob, alg; diffeq_solver_kwargs...)` instead of splatting all keyword arguments.
