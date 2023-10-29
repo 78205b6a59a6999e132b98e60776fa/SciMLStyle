@@ -71,19 +71,19 @@ SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciM
 
 正如 Python 的 PEP 8 所说：
 
-> 风格指南是有关一致性的准则。 代码与该风格指南保持一致性很重要， 在整个项目的尺度下保持一致性更为重要， 而在一个模块或函数内保持风格一致性最为重要。
+> 风格指南是有关一致性的准则。 代码与该风格指南保持一致性很重要， 在整个项目的尺度下保持一致性更为重要， 而最重要的是在一个模块或函数内保持风格的一致性。
 
-> 可比上述更为重要的是：知晓何时打破一致性 —— 风格指南并非万能。 当你陷入选择的困境，请仔细思考判断。 参考其他案例，并采取可能最好的方案。 并且，不要耻于提问！
+> 此外，不可或缺的是：知晓何时打破一致性 —— 因为风格指南并非无所不能。 当你陷入选择写法的困境，请仔细思考判断。 参考其他案例，并采取可能最好的方案。 并且，不要耻于提问！
 
-SciML 组织中的一些已经过时的代码，处于受支持状态，由研究人员捐赠以加以维护。 一致性是首要目标，因此应该在整个代码库的水平上修改风格以符合准则，而不仅仅是更新一个文件。
+SciML 组织中的有一些仍受支持的过时代码，由研究人员捐赠并加以维护。 保持风格的一致性是首要目标，因此应该在整个代码库的水平上作出修改以符合风格指南，而不仅仅是更新一个文件。
 
 ### 社区贡献准则
 
-你可以查看 [ColPrac](https://github.com/SciML/ColPrac) 获取完整的社区贡献指南。 其中，需要强调的要点是，一个 PR 应该只做一件事。 意味着更新软件包代码风格的 PR 不应与基本代码的贡献混在一起。 这种拆分使得大规模的风格改进，和可能引发不定性结果的实质性代码修改，得以互不干涉。
+你可以查看 [ColPrac](https://github.com/SciML/ColPrac) 获取完整的社区贡献指南。 其中，需要强调是，一个 PR 应该只做一件事。 意味着更新软件包代码风格的 PR 不应与基本代码的贡献混在一起。 这种拆分使得大规模的风格改进，和可能引发不定性结果的实质性代码修改，得以互不干涉。
 
 ### 开源贡献是从小到大的历练
 
-如果评判代码贡献好坏的标准，是任何 PR 都需要考虑到所有人的所有想法；这将会在维护者和新的参与者之间产生一道鸿沟。 比起严格的要求，原则上只需要在一开始尽可能做到正确，随时间推移，慢慢增加代码的通用性即可。 所有推荐的功能都需要通过测试，并且任何已知的普遍问题都需要被记录在 issue 中（如果可以的话，使用 `@test_broken` 测试）。 然而，比如存在一个不与 GPU 兼容的函数，其实这并不会阻碍代码的合并，相反的，这会鼓励同伴们提交下一个 PR 来改进这个支持。
+如果评判贡献代码好坏的标准，是任何一个 PR 都需要考虑到所有人的所有想法；那么这会在维护者和新的参与者之间划出一道鸿沟。 比起严格的要求，原则上只需要在一开始尽可能做到正确，随时间推移，慢慢增加代码的通用性即可。 所有建议的功能都需要通过测试，并且任何已知的普遍存在问题都需要被记录在 issue 中（如果可以的话，使用 `@test_broken` 测试）。 然而，比如目前存在一个不与 GPU 兼容的函数，这并不会阻碍这些代码的合并，相反的，这会鼓励同伴们提交下一个 PR 来改进该函数的支持。
 
 ### 使用通用化的代码
 
@@ -97,7 +97,7 @@ function f(A, B)
 end
 ```
 
-以上写法有两个缺陷。 其一，该函数假定了 `A` 使用了基于 1 的索引方法，而对于 [OffsetArrays](https://github.com/JuliaArrays/OffsetArrays.jl) 和 [FFTViews](https://github.com/JuliaArrays/FFTViews.jl) 的用例则会出现问题。 其二，该函数需要索引，但并不是所有的数组类型都支持索引（例如 [CuArrays](https://github.com/JuliaGPU/CuArrays.jl)）。 对此，通用且兼容性更好的实现方法是使用广播，例如：
+以上写法有两个缺陷。 其一，该函数假定了 `A` 使用了基于 “1” 的索引方法，而对于 [OffsetArrays](https://github.com/JuliaArrays/OffsetArrays.jl) 和 [FFTViews](https://github.com/JuliaArrays/FFTViews.jl) 的用例则会出现问题。 其二，该函数需要使用索引，但并不是所有的数组类型都支持索引（例如 [CuArrays](https://github.com/JuliaGPU/CuArrays.jl)）。 对此，通用且兼容性更好的实现方法是使用广播，例如：
 
 ```julia
 function f(A, B)
@@ -105,11 +105,11 @@ function f(A, B)
 end
 ```
 
-这将支持更广泛的数组类型。
+使用广播，将支持更多的数组类型。
 
 ### 尽可能匹配用户使用的类型
 
-如果 `f(A)` 接受某些集合作为输入，并从这些集合计算输出，那么可以期望如果用户将 `A` 作为 `Array` 传递，计算应该通过 `Array` 进行。 如果 `A` 是 `CuArray`，那么计算应该在内部使用 `CuArray` 进行（或者在不支持的情况下适当抛出错误）。 出于这些原因，在编写 `f` 时，通过类似 `similar(A)` 的通用方法构建数组优于使用非通用构造函数，例如 `Array(undef,size(A))`，除非该函数被记为非通用。
+如果 `f(A)` 以某些集合作为输入，并使用这些集合的内容进行计算。那么，理想情况下，如果用户传入的 `A` 是一个 `Array` 对象，那么函数内的计算应该通过 `Array` 进行。 如果 `A` 是一个 `CuArray` 对象，那么应该使用 `CuArray` 进行计算（或在不支持的情况下抛出错误）。 因此，在你编写 `f` 时，使用类似 `similar(A)` 的通用方法构建数组，优于使用诸如 `Array(undef,size(A))` 这类非通用的构造函数。除非你明确这个函数在文档中已经说明了它的不通用性。
 
 ### 尽可能使用 Trait 定义并遵循通用的接口
 
@@ -119,15 +119,15 @@ Julia 提供了许多不同的接口，例如：
 - [Indexing](https://docs.julialang.org/en/v1/manual/interfaces/#Indexing)
 - [Broadcast](https://docs.julialang.org/en/v1/manual/interfaces/#man-interfaces-broadcasting)
 
-这些接口应该尽可能被遵循。 例如，在定义广播重载时，应按照文档建议实现 `BroadcastStyle`，而不仅仅尝试通过 `copyto!` 重载来绕过广播系统。
+应该尽可能使用这些接口。 例如，在定义广播重载时，应按照文档的建议实现 `BroadcastStyle`，而不是通过 `copyto!` 重载来绕过广播系统。
 
-当接口函数缺失时，这些函数应该添加到 Base Julia 或一个接口包，比如 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl)。 在适当的情况下，应声明并使用这些 traits。 例如，如果一行代码需要进行突变，应在尝试变化之前检查 trait `ArrayInterface.ismutable(A)`，并编写完善的错误消息来捕获其不可变的情况（或者提供一个不进行突变的替代代码）。
+当接口函数缺失时，应该把相关功能的函数添加到 Base Julia 中或作为一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的一样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要进行数组的突变（Mutation），应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善的错误信息（或者提供一个不进行突变的代码版本）。
 
-这一原则的一个例子就是 Jacobian 矩阵的生成。 在许多科研领域的应用程序，人们可能希望从用户输入的 `u0` 中生成 Jacobian 缓存。 生成 Jacobian 矩阵的一种天真的方法是 `J = similar(u0, length(u0), length(u0))`。 然而，这将生成一个 `J`，使得 `J` 是 `Matrix` 类型。
+举个例子：雅可比（Jacobian）矩阵的生成。 在许多科研领域的应用，可能需要从用户输入的 `u0` 中生成雅可比（Jacobian）缓存。 你可能天真地以为，可以用 `J = similar(u0, length(u0), length(u0))` 生成雅可比（Jacobian）矩阵。 However, this will generate a Jacobian `J` such that `J isa Matrix`.
 
-### 应该限制使用宏，并只将其用于语法糖
+### 仅在作为语法糖的情况下使用宏
 
-宏定义了新的语法，因此相对于其他编码风格，它们往往不太能组合，并且需要事先熟悉才能容易理解。 一个要记住的原则是：“读代码的人能否轻松地想象出生成的代码是什么？”。 例如，Soss.jl 的用户可能不知道以下代码生成了什么样的代码：
+宏定义了新的语法，因此它们往往比其他编码风格更难以组合，并且需要事先熟悉才能理解。 要反复思考：你能否让你的阅读者想象出你生成了什么代码？ 例如，Soss.jl 的用户可能不知道以下代码生成了什么：
 
 ```julia
 @model (x, α) begin
@@ -140,14 +140,14 @@ Julia 提供了许多不同的接口，例如：
 end
 ```
 
-因此，不建议使用这样的宏作为接口。 然而，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它递归地将 `a*b + c` 转换为 `muladd(a,b,c)`，以提高[准确性和效率](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)），因此可以使用这样的宏，例如：
+因此，尽可能不要使用这种宏作为接口。 然而，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它[准确且高效](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)地使用递归将 `a*b + c` 转换为 `muladd(a,b,c)`），因此可以使用这样的宏：
 
 ```julia
 julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a032 * k2)))
 :(k3 = f((muladd)(c3, dt, t), (muladd).(dt, (muladd).(a032, k2, (*).(a031, k1)), uprev)))
 ```
 
-这种写法是推荐的。 其中一些这类宏包括：
+我们推荐使用上述写法。 同类的宏包括：
 
 - `@inbounds`
 - [`@muladd`](https://github.com/SciML/MuladdMacro.jl)
@@ -156,17 +156,17 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 - `@.`
 - [`@..`](https://github.com/YingboMa/FastBroadcast.jl)
 
-一些性能宏，如 `@simd`、`@threads` 或者来自 LoopVectorization.jl 的 [`@turbo`](https://github.com/JuliaSIMD/LoopVectorization.jl)，在这方面有个例外，它们生成的代码可能对许多用户来说是陌生的。 然而，它们仍然被归类为适当的用法，因为它们只是语法糖，除了性能之外，它们不会（或者不应该）以可测定的方式改变程序的行为。
+一些性能相关的宏，如 `@simd`、`@threads` 或者来自 LoopVectorization.jl 的 [`@turbo`](https://github.com/JuliaSIMD/LoopVectorization.jl) 是例外，它们生成的代码可能对大部分用户来说是陌生的。 然而，这些写法是合理的，因为它们只是语法糖：除了性能之外，它们不会（或者不应该）以可测定的方式改变程序的行为。
 
-### 尽可能捕获错误，并提供上下文信息以供参考
+### 尽可能捕获具有完善上下文的错误信息
 
-尽可能使用防御性编程在遇到潜在错误之前进行检查，以避免它们在包的更深层次出现。 例如，如果我们知道，除非 `u0` 的大小与 `p` 相同，否则 `f(u0,p)` 会出错，那么在函数的开始处应该捕获这个错误，并抛出一个特定作用域的错误，例如“参数和初始条件应该具有相同的大小”。
+使用防御性编程检查潜在的错误，避免它们在软件包的更深层次出现。 例如，存在一个函数 `f(u0,p)`，如果 `u0` 的大小与 `p` 不同，函数会出错。那么你应该在函数开始时就检查这个潜在问题，并适时抛出一个该作用域的错误，指出 “参数（parameters）和初始条件（initial condition）应该大小一致”。
 
-错误信息的上下文应该使用与用户界面 API 相关的术语（而不是引用内部实现细节）。  理想情况下，这样的错误消息不仅应该用用户熟悉的语言描述问题，而且在可能的情况下，还应包含如何纠正问题的建议。
+你应该在错误信息中使用用户所知道的 API 术语，而不是使用内部的实现细节。  在使用用户熟悉的语言描述清楚问题的同时，最好包含一些解决问题的建议。
 
-### 优先使用子包和接口包，而不是通过 Requires.jl 使用条件模块
+### 优先使用子包和接口包，而不是 Requires.jl
 
-应该不惜一切代价避免使用 Requireres.jl。 如果存在接口包，例如用于定义自动微分规则而无需依赖整个 ChainRules.jl 系统的 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)，或者用于定义 Plots.jl 绘图方式而无需依赖 Plots.jl 的 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl)，则更倾向于直接依赖这种接口包。
+想方设法不要使用 Requires.jl。 如果存在接口包，例如用于定义自动微分规则而无需依赖整个 ChainRules.jl 系统的 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)，或者用于定义 Plots.jl 绘图方式而无需依赖 Plots.jl 的 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl)，则更倾向于直接依赖这种接口包。
 
 否则，与其使用 Requires.jl 进行条件依赖，更倾向于创建子软件包，即在同一 GitHub 仓库中保留的较小的独立软件包，具有独立的版本控制和软件包管理。 这一点可以在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中看到，它有像 [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
 
