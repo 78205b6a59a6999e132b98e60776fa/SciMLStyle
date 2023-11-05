@@ -140,7 +140,7 @@ Julia 提供了许多不同的接口，例如：
 end
 ```
 
-因此，尽可能不要使用这种宏作为接口。 然而，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它[准确且高效](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)地使用递归将 `a*b + c` 转换为 `muladd(a,b,c)`），因此可以使用这样的宏：
+因此，尽可能不要使用这种宏作为接口。 不过，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它[准确且高效](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)地使用递归将 `a*b + c` 转换为 `muladd(a,b,c)`），因此可以使用这样的宏，例如：
 
 ```julia
 julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a032 * k2)))
