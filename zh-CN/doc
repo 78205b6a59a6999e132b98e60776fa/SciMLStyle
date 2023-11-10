@@ -965,22 +965,22 @@ function Manager end
 """
 ```
 
-### Error Handling
+### 报错处理
 
-- `error("string")` should be avoided. Defining and throwing exception types is preferred. See the [manual on exceptions for more details](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling).
+- `error("string")` 应予避免。 Defining and throwing exception types is preferred. See the [manual on exceptions for more details](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling).
 - Try to avoid `try/catch`. Use it as minimally as possible. Attempt to catch potential issues before running code, not after.
 
-### Arrays
+### 数组
 
-- Avoid splatting (`...`) whenever possible. Prefer iterators such as `collect`, `vcat`, `hcat`, etc. instead.
+- Avoid splatting (`...`) whenever possible. 优先使用迭代器，如 `collect`、 `vcat`、 `hcat` 等。
 
-### Line Endings
+### 行尾
 
 Always use Unix style `\n` line ending.
 
 ### VS-Code 配置
 
-If you are a user of VS Code we recommend that you have the following options in your Julia syntax specific settings. To modify these settings, open your VS Code Settings with <kbd>CMD</kbd>+<kbd>,</kbd> (Mac OS) or <kbd>CTRL</kbd>+<kbd>,</kbd> (other OS), and add to your `settings.json`:
+如果您用的是 VS Code，那么我们推荐您在 Julia 格式化设置中添加以下代码。 要使用这些设置，请使用快捷键 <kbd>CMD</kbd>+<kbd>,</kbd> （Mac OS）或 <kbd>CTRL</kbd>+<kbd>,</kbd> （其它系统）打开你的 VS Code 设置，然后将以下代码添加至 `settings.json` 中：
 
 ```json
 {
@@ -996,24 +996,24 @@ If you are a user of VS Code we recommend that you have the following options in
     },
 }
 ```
-Additionally, you may find the [Julia VS-Code plugin](https://github.com/julia-vscode/julia-vscode) useful.
+此外，您可能会发现 [Julia VS-Code 拓展](https://github.com/julia-vscode/julia-vscode) 很有用。
 
 ### JuliaFormatter
 
-**Note: the** `sciml` **style is only available in** `JuliaFormatter v1.0` **or later**
+**注意：** `sciml` **风格只在 ** `JuliaFormatter v1.0` **或更高版本中可用**
 
 One can add `.JuliaFormatter.toml` with the content
 ```toml
 style = "sciml"
 ```
-in the root of a repository, and run
+并在仓库根目录下运行
 ```julia
 using JuliaFormatter, SomePackage
 format(joinpath(dirname(pathof(SomePackage)), ".."))
 ```
-to format the package automatically.
+得以自动格式化软件包代码
 
-Add [FormatCheck.yml](https://github.com/SciML/ModelingToolkit.jl/blob/master/.github/workflows/FormatCheck.yml) to enable the formatting CI. The CI will fail if the repository needs additional formatting. Thus, one should run `format` before committing.
+添加 [FormatCheck.yml](https://github.com/SciML/ModelingToolkit.jl/blob/master/.github/workflows/FormatCheck.yml) 来启用 CI 格式化检测。  当代码不符合风格规范时，CI 会失败。 因此，在提交之前应该先进行 `格式化`。
 
 # 参考
 
