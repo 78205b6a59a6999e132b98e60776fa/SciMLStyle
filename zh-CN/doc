@@ -699,9 +699,9 @@ else
 end
 ```
 
-### For loops
+### For 循环
 
-For loops should always use `in`, never `=` or `∈`. This also applies to list and generator comprehensions
+循环应该始终使用 `in`，而不是 `=` 或 `∈`。 这也适用于列表和生成器推导式。
 
 ```julia
 # Yes
@@ -719,9 +719,9 @@ end
 [foo(x) for x ∈ xs]
 ```
 
-### Function Type Annotations
+### 函数类型标记
 
-Annotations for function definitions should be as general as possible.
+函数定义的注释应尽可能通用。
 
 ```julia
 # Yes:
@@ -731,7 +731,7 @@ splicer(arr::AbstractArray, step::Integer) = arr[begin:step:end]
 splicer(arr::Array{Int}, step::Int) = arr[begin:step:end]
 ```
 
-Using as many generic types as possible allows for a variety of inputs and allows your code to be more general:
+尽可能使用尽可能多的通用类型，可以允许多种输入，并使您的代码更加通用。
 
 ```julia
 julia> splicer(1:10, 2)
@@ -743,7 +743,7 @@ julia> splicer([3.0, 5, 7, 9], 2)
  7.0
 ```
 
-### Struct Type Annotations
+### 结构类型标记
 
 Annotations on type fields need to be given a little more thought, since field access is not concrete unless the compiler can infer the type (see [type-dispatch design](https://www.stochasticlifestyle.com/type-dispatch-design-post-object-oriented-programming-julia/) for details). Since well-inferred code is preferred, abstract type annotations, i.e.
 
@@ -755,7 +755,7 @@ mutable struct MySubString <: AbstractString
 end
 ```
 
-are not recommended. Instead a concretely-typed struct:
+是不推荐的。 相反，一个具体类型的结构体：
 
 ```julia
 mutable struct MySubString <: AbstractString
@@ -765,7 +765,7 @@ mutable struct MySubString <: AbstractString
 end
 ```
 
-is preferred. If generality is required, then parametric typing is preferred, i.e.:
+是更好的。 如果需要通用性，则首选参数化类型，如：
 
 ```julia
 mutable struct MySubString{T<:Integer} <: AbstractString
@@ -783,9 +783,9 @@ struct StructA
 end
 ```
 
-### Macros
+### 宏
 
-- Do not add spaces between assignments when there are multiple assignments.
+- 在有多个赋值时不要在赋值之间加上空格。
 
 ```julia
 Yes:
@@ -796,7 +796,7 @@ No:
 @parameters a = b c = d
 ```
 
-### Types and Type Annotations
+### 类型与类型标记
 
 - Avoid elaborate union types. `Vector{Union{Int,AbstractString,Tuple,Array}}` should probably be `Vector{Any}`. This will reduce the amount of extra strain on compilation checking many branches.
 - Unions should be kept to two or three types only for branch splitting. Unions of three types should be kept to a minimum for compile times.
@@ -871,27 +871,27 @@ struct MyArray{T, N} <: AbstractArray{T, N}
 end
 ```
 
-Function Template (only required for exported functions):
+函数模板（仅适用于导出函数）：
 
 ```julia
 """
     mysearch(array::MyArray{T}, val::T; verbose = true) where {T} -> Int
 
-Searches the `array` for the `val`. For some reason we don't want to use Julia's
-builtin search :)
+搜索`array`中的`val`。
+""" 出于某种原因，我们不想使用Julia内置的搜索功能 :)
 
-# Arguments
-- `array::MyArray{T}`: the array to search
-- `val::T`: the value to search for
+# 参数
+- `array::MyArray{T}`：要搜索的数组
+- `val::T`：要搜索的值
 
-# Keywords
-- `verbose::Bool = true`: print out progress details
+# 关键词
+- `verbose::Bool = true`：打印进度细节
 
-# Returns
-- `Int`: the index where `val` is located in the `array`
+# 返回值
+- `Int`：`val`在`array`中的索引位置
 
-# Throws
-- `NotFoundError`: I guess we could throw an error if `val` isn't found.
+# 异常
+- `NotFoundError`：如果未找到`val`，我们可以抛出一个错误。
 """
 function mysearch(array::AbstractArray{T}, val::T) where {T}
     ...
@@ -899,33 +899,33 @@ end
 ```
 
 - The `@doc doc""" """` formulation from the Markdown standard library should be used whenever there is LaTeX.
-- Only public fields of types must be documented. Undocumented fields are considered non-public internals.
+- 只有公共类型的字段必须进行文档记录。 未记录的字段被视为非公开的内部内容。
 - If your method contains lots of arguments or keywords, you may want to exclude them from the method signature on the first line and instead use `args...` and/or `kwargs...`.
 
 ```julia
 """
-    Manager(args...; kwargs...) -> Manager
+Manager(args...; kwargs...) -> Manager
 
-A cluster manager which spawns workers.
+一个用于生成工作节点的集群管理器。
+"""
 
-# Arguments
+# 参数
 
-- `min_workers::Integer`: The minimum number of workers to spawn or an exception is thrown
-- `max_workers::Integer`: The requested number of workers to spawn
+- `min_workers::Int`: 最小工作进程数，否则将抛出异常
+- `max_workers::Int`: 要生成的工作进程数
 
-# Keywords
+# 关键词
 
-- `definition::AbstractString`: Name of the job definition to use. Defaults to the
-    definition used within the current instance.
+- `definition::AbstractString`: 要使用的作业定义名称。 默认为当前实例中使用的定义。
 - `name::AbstractString`: ...
 - `queue::AbstractString`: ...
 """
 function Manager(...)
-    ...
+    ..
 end
 ```
 
-- Feel free to document multiple methods for a function within the same docstring. Be careful to only do this for functions you have defined.
+- 请随意在同一个文档字符串中记录一个函数的多种方法。 但请小心，只为你已定义的函数执行此操作。
 
 ```julia
 """
@@ -933,17 +933,16 @@ end
     Manager(min_workers:max_workers; kwargs...)
     Manager(min_workers, max_workers; kwargs...)
 
-A cluster manager which spawns workers.
+一个生成工作进程的集群管理器。
 
-# Arguments
+# 参数
 
-- `min_workers::Int`: The minimum number of workers to spawn or an exception is thrown
-- `max_workers::Int`: The requested number of workers to spawn
+- `min_workers::Int`: 最小工作进程数，否则将抛出异常
+- `max_workers::Int`: 要生成的工作进程数
 
-# Keywords
+# 关键词
 
-- `definition::AbstractString`: Name of the job definition to use. Defaults to the
-    definition used within the current instance.
+- `definition::AbstractString`: 要使用的作业定义名称。 默认为当前实例中使用的定义。
 - `name::AbstractString`: ...
 - `queue::AbstractString`: ...
 """
@@ -951,15 +950,14 @@ function Manager end
 
 ```
 
-- If the documentation for bullet-point exceeds 92 characters, the line should be wrapped and slightly indented. Avoid aligning the text to the `:`.
+- 如果文档中的项目符号超过92个字符，则应将该行换行并进行缩进。 请避免将文字对齐到`：`。
 
 ```julia
 """
 ...
 
-# Keywords
-- `definition::AbstractString`: Name of the job definition to use. Defaults to the
-    definition used within the current instance.
+# 关键字
+- `definition::AbstractString`：要使用的作业定义的名称。 默认为当前实例中使用的定义。
 """
 ```
 
