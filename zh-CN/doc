@@ -119,9 +119,9 @@ Julia 提供了许多不同的接口，例如：
 - [Indexing](https://docs.julialang.org/en/v1/manual/interfaces/#Indexing)
 - [Broadcast](https://docs.julialang.org/en/v1/manual/interfaces/#man-interfaces-broadcasting)
 
-应该尽可能使用这些接口。 例如，在定义广播重载时，应按照文档的建议实现 `BroadcastStyle`，而不是通过 `copyto!` 重载来绕过广播系统。
+应该尽可能使用这些接口。 例如，在定义广播重载时，应按照文档的建议实现 `BroadcastStyle`，而不是通过 `copyto!` 重载来绕过广播机制。
 
-当接口函数缺失时，应该把相关功能的函数添加到 Base Julia 中或作为一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的一样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要进行数组的突变（Mutation），应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善的错误信息（或者提供一个不进行突变的代码版本）。
+当缺少接口函数时，应该把相关功能的函数添加到 Base Julia 中或作为一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的一样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要进行数组的突变（Mutation），应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善的错误信息（或者提供一个不进行突变的代码版本）。
 
 举个例子：雅可比（Jacobian）矩阵的生成。 在许多科研领域的应用，可能需要从用户输入的 `u0` 中生成雅可比（Jacobian）缓存。 你可能天真地以为，可以用 `J = similar(u0, length(u0), length(u0))` 生成雅可比（Jacobian）矩阵。 但这样生成的雅可比（Jacobian） 矩阵 J 会是一个 Matrix 类型的矩阵
 
