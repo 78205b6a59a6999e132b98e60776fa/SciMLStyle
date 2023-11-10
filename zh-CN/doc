@@ -121,7 +121,7 @@ Julia 提供了许多不同的接口，例如：
 
 应该尽可能使用这些接口。 例如，在定义广播重载时，应按照文档的建议实现 `BroadcastStyle`，而不是通过 `copyto!` 重载来绕过广播机制。
 
-当缺少接口函数时，应该把相关功能的函数添加到 Base Julia 中或作为一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的一样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要进行数组的突变（Mutation），应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善的错误信息（或者提供一个不进行突变的代码版本）。
+当缺少接口函数时，应该把相关功能的函数添加到 Base Julia 中或创建一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的一样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要数组可变，应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善的错误信息（或者提供一个不要求可变的代码版本）。
 
 举个例子：雅可比（Jacobian）矩阵的生成。 在许多科研领域的应用，可能需要从用户输入的 `u0` 中生成雅可比（Jacobian）缓存。 你可能天真地以为，可以用 `J = similar(u0, length(u0), length(u0))` 生成雅可比（Jacobian）矩阵。 但这样生成的雅可比（Jacobian） 矩阵 J 却会是一个 Matrix 类型的矩阵
 
@@ -140,7 +140,7 @@ Julia 提供了许多不同的接口，例如：
 end
 ```
 
-因此，尽可能不要使用这种宏作为接口。 不过，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它[准确且高效](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)地使用递归将 `a*b + c` 转换为 `muladd(a,b,c)`），因此可以使用这样的宏，例如：
+因此，尽可能不要使用这种宏作为接口。 不过，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它能[准确且高效](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)地使用递归将 `a*b + c` 转换为 `muladd(a,b,c)`），因此可以使用这样的宏，例如：
 
 ```julia
 julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a032 * k2)))
@@ -160,9 +160,9 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 ### 尽可能捕获具有完善上下文的错误信息
 
-使用防御性编程检查潜在的错误，避免它们在软件包的更深层次出现。 例如，存在一个函数 `f(u0,p)`，如果 `u0` 的大小与 `p` 不同，函数会出错。那么你应该在函数开始时就检查这个潜在问题，并适时抛出一个该作用域的错误，指出 “参数（parameters）和初始条件（initial condition）应该大小一致”。
+使用防御性编程检查潜在的错误，避免它们出现在软件包的更深层次。 例如，存在一个函数 `f(u0,p)`，如果 `u0` 的大小与 `p` 不同，函数会出错。那么你应该在函数开始时就检查这个潜在问题，并适时抛出一个该作用域的错误，指出 “参数（parameters）和初始条件（initial condition）应该大小一致”。
 
-你应该在错误信息中使用用户所知道的 API 术语，而不是使用内部的实现细节。  在使用用户熟悉的语言描述清楚问题的同时，最好包含一些解决问题的建议。
+你应该在错误信息中输出用户所知道的 API 术语，而不是指向内部的实现细节。  在使用用户熟悉的语言描述清楚问题的同时，最好包含一些解决问题的建议。
 
 ### 优先使用子包和接口包，而不是 Requires.jl
 
@@ -444,10 +444,10 @@ The vast majority of functions will not take every kind of argument listed above
 
     ```julia
     # Yes:
-    if x == 4 @show(x, y); x, y = y, x end
+    spam(ham[1], [eggs])
 
     # No:
-    if x == 4 @show(x , y) ; x , y = y , x end
+    spam( ham[ 1 ], [ eggs ] )
     ```
 
 - Avoid whitespace around `:` in ranges. Use brackets to clarify expressions on either side.
@@ -673,9 +673,7 @@ Ternary operators (`?:`) should generally only consume a single line. Do not cha
 
 ```julia
 # Yes:
-foobar = foo == 2 ? bar : baz
-
-# No:
+foobar = foo == 2 ? # Yes:
 foobar = foo == 2 ?
     bar :
     baz
@@ -822,12 +820,12 @@ DataFrames = "^0.17"
 - All packages should use [CompatHelper](https://github.com/JuliaRegistries/CompatHelper.jl) and attempt to stay up to date with the dependencies.
 - The lower bound on dependencies should be the last tested version.
 
-### Documentation
+### 文档
 
-- Documentation should always attempt to be at the highest level possible. I.e., documentation of an interface that all methods follow is preferred to documenting every method, and documenting the interface of an abstract type is preferred to documenting all the subtypes individually. All instances should then refer to the higher level documentation.
-- Documentation should use [Documenter.jl](https://juliadocs.github.io/Documenter.jl/stable/).
-- Tutorials should come before reference materials.
-- Every package should have a starting tutorial that covers "the 90% use case", i.e. the ways that most people will want to use the package.
+- 文档编写应始终追求最高水平。 换言之，倾向于编写一个适用于所有方法的接口文档，而不是为每个方法都编写文档，倾向于为抽象类型编写接口文档，而不是为每个子类型都编写文档。 所有实例应该引用更高层级的文档。
+- 文档应该使用 [Document.jl](https://juliadocs.github.io/Documenter.jl/stable/)  来构建。
+- 教程应该写在参考材料之前。
+- 每个包都应该有一个入门教程，能够涵盖“90%的用例”，即大多数人会想要使用包的方式。
 - The tutorial should show a complete workflow and be opinionated about said workflow. For example, when writing a tutorial about a simulator, pick a plotting package and show how to plot it.
 - Variable names in tutorials are important. If you use `u0`, then all other codes will copy that naming scheme. Show potential users the right way to use your code with the right naming.
 - When applicable, tutorials on how to use the "high performance advanced features" should be separated from the beginning tutorial.
@@ -967,16 +965,16 @@ function Manager end
 
 ### 报错处理
 
-- `error("string")` 应予避免。 Defining and throwing exception types is preferred. See the [manual on exceptions for more details](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling).
-- Try to avoid `try/catch`. Use it as minimally as possible. Attempt to catch potential issues before running code, not after.
+- `error("string")` 应予避免。 首选是定义和抛出异常类型。 请参阅[有关异常的文档，以获取更多详细信息](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling)。
+- 尝试避免使用 `try/catch`。 Use it as minimally as possible. 应该在运行代码之前就处理好潜在问题。
 
 ### 数组
 
-- Avoid splatting (`...`) whenever possible. 优先使用迭代器，如 `collect`、 `vcat`、 `hcat` 等。
+- 尽可能避免使用 splating 语法（`...`）。 优先使用迭代器，如 `collect`、 `vcat`、 `hcat` 等。
 
 ### 行尾
 
-Always use Unix style `\n` line ending.
+总是遵循 Unix 风格在代码最后一行添加 `\n`。
 
 ### VS-Code 配置
 
@@ -1002,7 +1000,7 @@ Always use Unix style `\n` line ending.
 
 **注意：** `sciml` **风格只在 ** `JuliaFormatter v1.0` **或更高版本中可用**
 
-One can add `.JuliaFormatter.toml` with the content
+添加以下内容到 `.JuliaFormatter.toml`
 ```toml
 style = "sciml"
 ```
@@ -1013,7 +1011,7 @@ format(joinpath(dirname(pathof(SomePackage)), ".."))
 ```
 得以自动格式化软件包代码
 
-添加 [FormatCheck.yml](https://github.com/SciML/ModelingToolkit.jl/blob/master/.github/workflows/FormatCheck.yml) 来启用 CI 格式化检测。  当代码不符合风格规范时，CI 会失败。 因此，在提交之前应该先进行 `格式化`。
+添加 [FormatCheck.yml](https://github.com/SciML/ModelingToolkit.jl/blob/master/.github/workflows/FormatCheck.yml) 来启用 CI 格式化检测。  当代码不符合风格规范时，CI 会失败。 因此，在提交之前应该先执行 `格式化`。
 
 # 参考
 
