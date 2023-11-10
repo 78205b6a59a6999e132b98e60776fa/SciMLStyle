@@ -826,9 +826,9 @@ DataFrames = "^0.17"
 - 文档应该使用 [Document.jl](https://juliadocs.github.io/Documenter.jl/stable/)  来构建。
 - 教程应该写在参考材料之前。
 - 每个包都应该有一个入门教程，能够涵盖“90%的用例”，即大多数人会想要使用包的方式。
-- The tutorial should show a complete workflow and be opinionated about said workflow. For example, when writing a tutorial about a simulator, pick a plotting package and show how to plot it.
-- Variable names in tutorials are important. If you use `u0`, then all other codes will copy that naming scheme. Show potential users the right way to use your code with the right naming.
-- When applicable, tutorials on how to use the "high performance advanced features" should be separated from the beginning tutorial.
+- 教程应该展示一个完整的工作流程，并对该工作流程持有明确的观点。 例如，当撰写一个关于模拟器的教程时，选择一个绘图包并展示如何进行绘图。
+- 教程中的变量名很重要。 如果您使用 `u0`，那么所有其他代码都应使用相同的命名。 Show potential users the right way to use your code with the right naming.
+- 适用时，关于如何使用“高性能高级功能”的教程应该与入门教程分开。
 - All documentation should summarize the contents before going into specifics of API docstrings.
 - Most modules, types and functions should have [docstrings](http://docs.julialang.org/en/v1/manual/documentation/).
 - Prefer documenting accessor functions instead of fields when possible. Documented fields are part of the public API and changing their contents/name constitutes a breaking change.
@@ -836,7 +836,7 @@ DataFrames = "^0.17"
 - Avoid documenting commonly overloaded methods, such as `==`.
 - Try to document a function and not individual methods where possible, as typically all methods will have similar docstrings.
 - If you are adding a method to a function that already has a docstring only add a docstring if the behavior of your function deviates from the existing docstring.
-- Docstrings are written in [Markdown](https://en.wikipedia.org/wiki/Markdown) and should be concise.
+- 文档字符串应使用 [Markdown](https://en.wikipedia.org/wiki/Markdown) 语法编写，且需简明扼要。
 - Docstring lines should be wrapped at 92 characters.
 
 ```julia
