@@ -822,22 +822,22 @@ DataFrames = "^0.17"
 
 ### 文档
 
-- 文档应始终尽量在最高级编写。 换言之，倾向于编写一个适用于所有方法的接口文档，而不是为每个方法都编写文档，倾向于为抽象类型编写接口文档，而不是为每个子类型都编写文档。 所有实例应该引用更高层级的文档。
+- 文档应始终尽量在最高级编写。 换言之，倾向于编写一个适用于所有方法的接口文档，而不是为每个方法都编写文档，倾向于为抽象类型编写接口文档，而不是为每个子类型都编写文档。 所有实例应该指向更高层级的文档。
 - 文档应该使用 [Document.jl](https://juliadocs.github.io/Documenter.jl/stable/)  来构建。
 - 教程应该写在参考材料之前。
-- 每个包都应该有一个入门教程，能够涵盖“90%的用例”，即大多数人会想要使用包的方式。
-- 教程应该展示一个完整的工作流程，并对该工作流程持有明确的观点。 例如，当撰写一个关于模拟器的教程时，选择一个绘图包并展示如何进行绘图。
-- 教程中的变量名很重要。 如果您使用 `u0`，那么所有其他代码都应使用相同的命名。 Show potential users the right way to use your code with the right naming.
-- 适用时，关于如何使用“高性能高级功能”的教程应该与入门教程分开。
-- All documentation should summarize the contents before going into specifics of API docstrings.
-- Most modules, types and functions should have [docstrings](http://docs.julialang.org/en/v1/manual/documentation/).
-- Prefer documenting accessor functions instead of fields when possible. Documented fields are part of the public API and changing their contents/name constitutes a breaking change.
-- Only exported functions are required to be documented.
-- Avoid documenting commonly overloaded methods, such as `==`.
-- Try to document a function and not individual methods where possible, as typically all methods will have similar docstrings.
-- If you are adding a method to a function that already has a docstring only add a docstring if the behavior of your function deviates from the existing docstring.
-- 文档字符串应使用 [Markdown](https://en.wikipedia.org/wiki/Markdown) 语法编写，且需简明扼要。
-- Docstring lines should be wrapped at 92 characters.
+- 每个包都应该有一个入门教程，并且能够涵盖“90%的用例”，即包含大多数人会想要使用包的方式。
+- 教程应该展示一个完整的工作流，并明确写出该工作流各部分的操作及流程。 例如，当撰写一个关于仿真器的教程时，应该明确指出使用哪个绘图包并展示如何用其进行绘图。
+- 教程中的变量名很重要。 如果您使用 `u0`，那么所有其他代码都应使用相同的命名。 向潜在用户展示如何以正确的命名方式正确的使用您的代码。
+- 若情况合适，如何使用“高性能高级功能”的教程应该与入门教程分开。
+- 在进入 API 文档字符串的具体细节之前，所有文档都应该总结其内容。
+- 大多数模块、类型和函数应该有[文档字符串](http://docs.julialang.org/en/v1/manual/documentation/)。
+- 文档应尽可能提供访问函数而不是相关字段的链接。 文档化后的字段是公共 API 的一部分，更改其内容/名称将构成破坏性更改。
+- 只有导出的函数才需要进行文档化。
+- 避免编写常常被重载的方法，例如 `==`。
+- 尽量在可能的情况下为一个函数而不是单独的方法编写文档，因为通常所有的方法都会有相似的文档字符串。
+- 如果您正在为已经有文档字符串的函数添加一个方法，只有在您的函数行为与现有的文档字符串不一致时，才添加一个新的文档字符串。
+- 文档字符串应使用 [Markdown](https://en.wikipedia.org/wiki/Markdown) 语法编写，且内容需简明扼要。
+- 文档字符串的单行长度不超过92个字符。
 
 ```julia
 """
