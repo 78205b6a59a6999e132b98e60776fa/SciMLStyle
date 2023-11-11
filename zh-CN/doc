@@ -385,7 +385,7 @@ function my_large_function(argument1,
 ```
 
 
-### Function Argument Precedence
+### 函数参数优先级
 
 1. **Function argument**. Putting a function argument first permits the use of [`do`](https://docs.julialang.org/en/v1/base/base/#do) blocks for passing multiline anonymous functions.
 
@@ -428,7 +428,7 @@ The vast majority of functions will not take every kind of argument listed above
 - Any package supporting GPUs should include continuous integration for GPUs.
 - [Doctests](https://juliadocs.github.io/Documenter.jl/stable/man/doctests/) should be enabled except for the examples that are computationally-prohibitive to have as part of continuous integration.
 
-### Whitespace
+### 空格
 
 - Avoid extraneous whitespace immediately inside parentheses, square brackets or braces.
 
@@ -634,7 +634,7 @@ The vast majority of functions will not take every kind of argument listed above
     end
     ```
 
-### NamedTuples
+### 命名元组
 
 The `=` character in `NamedTuple`s should be spaced as in keyword arguments. Space should be put between the name and its value. The empty `NamedTuple` should be written `NamedTuple()` not `(;)`
 
@@ -649,7 +649,7 @@ xy = (x=1, y=2)
 xy = (;x=1,y=2)
 ```
 
-### Numbers
+### 数值
 
 - Floating-point numbers should always include a leading and/or trailing zero:
 
