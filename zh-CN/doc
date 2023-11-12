@@ -359,13 +359,13 @@ foobar(array_data::AbstractArray{T}, item::T) where {T <: Int64} = T[
 ```
 
 - 函数应该要求输入参数，除非提供历史上广受认可的默认值，或确保默认值在 > 95% 的情况下都是合适的。 例如，大多数情况下，微分方程求解器的容差默认值为 `abstol=1e-6、reltol=1e-3`，这是从 90 年代开始就普遍认可的绘图参数。 在这种情况下，使用历史承认、或最常用的值作为默认值是合理的。 然而，如果实现了 `GradientDescent`（梯度下降）算法，学习率（Learning Rate）需要根据每个应用程序进行调整（基于梯度的大小），因此不建议使用默认值，如 `GradientDescent(learning_rate = 1)`。
-- 没有默认值的参数应该被作为位置参数。 新的必填关键词参数语法或许有所帮助，但不应该滥用。 Notable exceptions are cases where "either or" arguments are accepted, for example, if defining `g` or `dgdu` is sufficient, then making them both keyword arguments with `= nothing` and checking that either is not `nothing` (and throwing an appropriate error) is recommended if distinct dispatches with different types is not possible.
-- When calling a function, always separate your keyword arguments from your positional arguments with a semicolon. This avoids mistakes in ambiguous cases (such as splatting a Dict).
-- When writing a function that sends a lot of keyword arguments to another function, say sending keyword arguments to a differential equation solver, use a named tuple keyword argument instead of splatting the keyword arguments. For example, use `diffeq_solver_kwargs = (; abstol=1e-6, reltol=1e-6,)` as the API and use `solve(prob, alg; diffeq_solver_kwargs...)` instead of splatting all keyword arguments.
-- Functions that mutate arguments should be appended with `!`.
-- [Avoid type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy). I.e., do not add methods to functions you don't own on types you don't own. Either own the types or the function.
-- Functions should prefer instances instead of types for arguments. For example, for a solver type `Tsit5`, the interface should use `solve(prob,Tsit5())`, not `solve(prob,Tsit5)`. The reason for this is multifold. For one, passing a type has different specialization rules, so functionality can be slower unless `::Type{Tsit5}` is written in the dispatches that use it. Secondly, this allows for default and keyword arguments to extend the choices, which may become useful for some types down the line. Using this form allows for adding more options in a non-breaking manner.
-- If the number of arguments is too large to fit into a 92 character line, then use as many arguments as possible within a line and start each new row with the same indentation, preferably at the same column as the `(` but this can be moved left if the function name is very long. For example:
+- 没有默认值的参数应该被作为位置参数。 新的必填关键词参数语法或许有所帮助，但不应该滥用。 显著的例外情况是"either or"的参数，在这种情况下是允许的。例如，如果定义`g`或`dgdu`就足够了，那么建议将它们都作为关键字参数，并使用`= nothing`来检查它们是否为`nothing`（并抛出适当的错误），如果无法使用具有不同类型的不同调度的话。
+- 在调用函数时，始终使用一个分号将关键字参数和位置参数分隔开。 这样做可以避免在模棱两可的情况下出错（如对Dict进行splatting）。
+- 当编写一个向另一个函数发送大量关键字参数的函数时，比如向微分方程求解器发送关键字参数，应该使用命名元组关键字参数，而不是展开关键字参数。 例如，使用`diffeq_solver_kwargs = (; abstol=1e-6, reltol=1e-6,)`作为API，并使用`solve(prob, alg; diffeq_solver_kwargs...)`而不是对所有关键字参数使用spla。
+- 修改参数的函数应该以`!`结尾。
+- 避免类型盗用。 即使在您不拥有的类型上，也不要在您不拥有的函数上添加方法。 要么拥有类型，要么拥有函数。
+- 函数应优先使用实例而不是类型作为参数。 例如，对于求解器类型` Tsit5 `，接口应该使用` solve(prob, Tsit5()) `，而不是` solve(prob, Tsit5) `。 这个原因是多方面的。 首先，一个类型的传递有不同的特化规则，因此，除非在使用它的调度中写入`::Type{Tsit5}`，否则功能可能会较慢。 其次，这样做可以利用默认参数和关键字参数来扩展选择，这对于一些后续类型可能会很有用。 使用这种表单可以以不中断的方式添加更多选项。
+- 如果参数数量太多，无法适应一个92个字符的行，那么尽可能在一行内使用尽可能多的参数，并在每一行的开头保持相同的缩进，最好与`(`处的列对齐，但如果函数名特别长，则可以向左移动。 例如：
 
 ```julia
 # Yes
@@ -393,21 +393,21 @@ function my_large_function(argument1,
 
 3. **Input being mutated**. 例如，在 [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!) 中，`x` 是被修改的对象，而且在要插入到 `x` 中的值之前出现。
 
-4. **Type**. Passing a type typically means that the output will have the given type. In [`parse(Int, "1")`](https://docs.julialang.org/en/v1/base/numbers/#Base.parse), the type comes before the string to parse. There are many such examples where the type appears first, but it's useful to note that in [`read(io, String)`](https://docs.julialang.org/en/v1/base/io-network/#Base.read), the `IO` argument appears before the type, which is in keeping with the order outlined here.
+4. **类型**。 传递一个类型通常意味着输出将具有给定的类型。 In [`parse(Int, "1")`](https://docs.julialang.org/en/v1/base/numbers/#Base.parse), the type comes before the string to parse. 有很多这样的例子，其中类型首先出现，但值得注意的是，在[`read(io, String)`](https://docs.julialang.org/en/v1/base/io-network/#Base.read)中，`IO`参数出现在类型之前，这与这里概述的顺序一致。
 
 5. **Input not being mutated**. In `fill!(x, v)`, `v` is *not* being mutated and it comes after `x`.
 
-6. **Key**。 For associative collections, this is the key of the key-value pair(s). For other indexed collections, this is the index.
+6. **Key**。 对于关联集合，这是键 - 值对的键。 对于其他已被索引的集合，这是索引。
 
-7. **Value**。 For associative collections, this is the value of the key-value pair(s). In cases like [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!), this is `v`.
+7. **Value**。 对于关联集合，这是键值对的值。 在类似[`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!)这样的情况下，这是`v`。
 
-8. **其他一切**。 Any other arguments.
+8. **其他一切**。 任何其他参数。
 
-9. **Varargs**. This refers to arguments that can be listed indefinitely at the end of a function call. For example, in `Matrix{T}(undef, dims)`, the dimensions can be given as a [`Tuple`](https://docs.julialang.org/en/v1/base/base/#Core.Tuple), e.g. `Matrix{T}(undef, (1,2))`, or as [`Vararg`](https://docs.julialang.org/en/v1/base/base/#Core.Vararg)s, e.g. `Matrix{T}(undef, 1, 2)`.
+9. **可变参数**。 这是指可以在函数调用的末尾无限列举的参数。 For example, in `Matrix{T}(undef, dims)`, the dimensions can be given as a [`Tuple`](https://docs.julialang.org/en/v1/base/base/#Core.Tuple), e.g. `Matrix{T}(undef, (1,2))`, or as [`Vararg`](https://docs.julialang.org/en/v1/base/base/#Core.Vararg)s, e.g. `Matrix{T}(undef, 1, 2)`.
 
-10. **Keyword arguments**. In Julia keyword arguments have to come last anyway in function definitions; they're listed here for the sake of completeness.
+10. **关键字参数**。 在Julia中，关键字参数无论如何都必须在函数定义的最后；它们在这里列出是为了完整起见。
 
-The vast majority of functions will not take every kind of argument listed above; the numbers merely denote the precedence that should be used for any applicable arguments to a function.
+绝大多数函数不会使用上述列出的所有种类的参数；数字只是表示应该用于函数的任何适用参数的优先级。
 
 ### 测试与持续集成
 
@@ -419,10 +419,10 @@ The vast majority of functions will not take every kind of argument listed above
 @time @safetestset "Jacobian Tests" include("interface/jacobian_tests.jl")
 ```
 
-- 每个测试脚本都应该在隔离环境中完全可复现。 I.e., one should be able to copy paste that script and receive the results.
-- Test scripts should be grouped based on categories, for example tests of the interface vs tests for numerical convergence. Grouped tests should be kept in the same folder.
-- A `GROUP` environment variable should be used to specify test groups for parallel testing in continuous integration. A fallback group `All` should be used to specify all the tests that should be run when a developer runs `]test Package` locally. As an example, see the [OrdinaryDiffEq.jl test structure](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)
-- Tests should include downstream tests to major packages which use the functionality, to ensure continued support. Any update that breaks the downstream tests should follow with a notification to the downstream package of why the support was broken (preferably in the form of a PR that fixes support), and the package should be given a major version bump in the next release if the changed functionality was part of the public API.
+- 每个测试脚本都应该在隔离环境中完全可复现。 我的意思是，一个人应该能够复制粘贴这个脚本并得到结果。
+- 测试脚本应根据类别进行分组，例如接口测试与数值收敛测试。 分组的测试应该保存在同一个文件夹中。
+- 一个 `GROUP` 环境变量应该被用来在持续集成中指定用于并行测试的测试组。 A fallback group `All` should be used to specify all the tests that should be run when a developer runs `]test Package` locally. 作为一个例子，请参考[OrdinaryDiffEq.jl测试结构](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)。
+- 测试应该包括对使用该功能的主要软件包的下游测试，以确保持续支持。 任何导致下游测试中断的更新都应该跟随一个通知，通知下游包关于为什么支持被破坏（最好是以修复支持的PR形式），如果更改的功能属于公共API的一部分，下一次发布中该包应该被赋予主要版本升级。
 - 配置信息脚本应该使用默认配置，除非有必要。
 - CI脚本应该测试长期支持（LTS）版本和当前稳定版本。 每夜测试仅对特定编译器细节有严重依赖的软件包才是必要的。
 - 任何支持GPU的软件包都应该包含针对GPU的持续集成。
@@ -469,7 +469,7 @@ The vast majority of functions will not take every kind of argument listed above
     ham[lower + offset:upper + offset]  # Avoid as it is easy to read as `ham[lower + (offset:upper) + offset]`
     ```
 
-- Avoid using more than one space around an assignment (or other) operator to align it with another:
+- 避免在赋值（或其他）操作符周围使用多个空格以将其与其他操作符对齐：
 
     ```julia
     # Yes:
@@ -483,7 +483,7 @@ The vast majority of functions will not take every kind of argument listed above
     long_variable = 3
     ```
 
-- Surround most binary operators with a single space on either side: assignment (`=`), [updating operators](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Updating-operators-1) (`+=`, `-=`, etc.), [numeric comparisons operators](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Numeric-Comparisons-1) (`==`, `<`, `>`, `!=`, etc.), [lambda operator](https://docs.julialang.org/en/v1/manual/functions/#man-anonymous-functions-1) (`->`). Binary operators may be excluded from this guideline include: the [range operator](https://docs.julialang.org/en/v1/base/math/#Base.::) (`:`), [rational operator](https://docs.julialang.org/en/v1/base/math/#Base.://) (`//`), [exponentiation operator](https://docs.julialang.org/en/v1/base/math/#Base.:^-Tuple{Number,%20Number}) (`^`), [optional arguments/keywords](https://docs.julialang.org/en/v1/manual/functions/#Optional-Arguments-1) (e.g. `f(x = 1; y = 2)`).
+- 在大多数二进制运算符的两侧加上一个空格：赋值运算符（`=`），更新运算符（`+=`，`-=`等），数值比较运算符（`==`，`<`，`>`，`!=`等），lambda 运算符（`->`）。 不包括以下二元运算符：范围运算符（`:`）、有理数运算符（`//`）、指数运算符（`^`）以及可选参数/关键字（例如 `f(x = 1; y = 2)`）。请勿将这些运算符包含在本准则中。
 
     ```julia
     # Yes:
@@ -497,7 +497,7 @@ The vast majority of functions will not take every kind of argument listed above
     x^2<y
     ```
 
-- Avoid using whitespace between unary operands and the expression:
+- 避免在一元操作数和表达式之间使用空格。
 
     ```julia
     # Yes:
@@ -509,7 +509,7 @@ The vast majority of functions will not take every kind of argument listed above
     [1 0 - 1]  # Note: evaluates to `[1 -1]`
     ```
 
-- Avoid extraneous empty lines. Avoid empty lines between single line method definitions and otherwise separate functions with one empty line, plus a comment if required:
+- 避免多余的空行。 避免在单行方法定义之间留空行，而在其他独立的函数之间使用一个空行分隔，如果需要的话，可以加上注释。
 
     ```julia
     # Yes:
