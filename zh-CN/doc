@@ -636,7 +636,7 @@ The vast majority of functions will not take every kind of argument listed above
 
 ### 命名元组
 
-The `=` character in `NamedTuple`s should be spaced as in keyword arguments. Space should be put between the name and its value. The empty `NamedTuple` should be written `NamedTuple()` not `(;)`
+在`NamedTuple`中，`=`字符应该像关键字参数一样有空格。 参数名称与其值之间应该留空格。 空 `NamedTuple` 应该写入 `NamedTuple()` 而不是 `(;)`
 
 ```julia
 # Yes:
@@ -651,7 +651,7 @@ xy = (;x=1,y=2)
 
 ### 数值
 
-- Floating-point numbers should always include a leading and/or trailing zero:
+- 浮点数应始终写出小数点前面和/或后面的零：
 
 ```julia
 # Yes:
@@ -667,9 +667,9 @@ xy = (;x=1,y=2)
 
 - Always prefer the type `Int` to `Int32` or `Int64` unless one has a specific reason to choose the bit size.
 
-### Ternary Operator
+### 三元操作符
 
-Ternary operators (`?:`) should generally only consume a single line. Do not chain multiple ternary operators. If chaining many conditions, consider using an `if`-`elseif`-`else` conditional, dispatch, or a dictionary.
+三元运算符（`?:`）通常只应占一行。 不要连续嵌套多个三元运算符。 如果连续嵌套了多个三元操作符，请考虑使用类似 `if`-`elseif`-`else` 这样的条件语句、派发或是字典。
 
 ```julia
 # Yes:
@@ -680,7 +680,7 @@ foobar = foo == 2 ?
 foobar = foo == 2 ? bar : foo == 3 ? qux : baz
 ```
 
-As an alternative, you can use a compound boolean expression:
+还有一种替代方案，你可以使用复合布尔表达式：
 
 ```julia
 # Yes:
@@ -798,8 +798,8 @@ No:
 
 ### 类型与类型标记
 
-- Avoid elaborate union types. `Vector{Union{Int,AbstractString,Tuple,Array}}` should probably be `Vector{Any}`. This will reduce the amount of extra strain on compilation checking many branches.
-- Unions should be kept to two or three types only for branch splitting. Unions of three types should be kept to a minimum for compile times.
+- 避免使用复杂的 union 类型。 `Vector{Union{Int,AbstractString,Tuple,Array}}` 应该改为 `Vector{Any}`。 这将减少编译检查许多分支时的额外压力。
+- 分支拆分时，应只保留两到三种类型的 Unions. Unions of three types should be kept to a minimum for compile times.
 - Do not use `===` to compare types. Use `isa` or `<:` instead.
 
 ### Package version specifications
