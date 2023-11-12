@@ -1,6 +1,6 @@
 # SciML Julia 风格指南
 
-[![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle) [![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/SciMLStyle/stable/)
+[![SciML 编码风格](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle) [![全局文档](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/SciMLStyle/stable/)
 
 SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciML 开源科学机器学习组织](https://sciml.ai/) 所使用。 因此，它在社区开放讨论。 请提交一个 issue 或开启一个 PR 来讨论对该风格指南的修改。
 
@@ -387,9 +387,9 @@ function my_large_function(argument1,
 
 ### 函数参数优先级
 
-1. **Function argument**. Putting a function argument first permits the use of [`do`](https://docs.julialang.org/en/v1/base/base/#do) blocks for passing multiline anonymous functions.
+1. **函数参数**。 将函数参数放在首位，允许使用 [`do`](https://docs.julialang.org/en/v1/base/base/#do) 块来传递多行匿名函数。
 
-2. **I/O stream**. Specifying the `IO` object first permits passing the function to functions such as [`sprint`](https://docs.julialang.org/en/v1/base/io-network/#Base.sprint), e.g. `sprint(show, x)`.
+2. **I/O 流**。 Specifying the `IO` object first permits passing the function to functions such as [`sprint`](https://docs.julialang.org/en/v1/base/io-network/#Base.sprint), e.g. `sprint(show, x)`.
 
 3. **Input being mutated**. For example, in [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!), `x` is the object being mutated and it appears before the value to be inserted into `x`.
 
@@ -802,10 +802,10 @@ No:
 - 分支拆分时，应只保留两到三种类型的 Unions. Unions of three types should be kept to a minimum for compile times.
 - Do not use `===` to compare types. Use `isa` or `<:` instead.
 
-### Package version specifications
+### 软件包版本规范
 
-- Use [Semantic Versioning](https://semver.org/)
-- For simplicity, avoid including the default caret specifier when specifying package version requirements.
+- 使用[语义化版本控制](https://semver.org/)
+- 为了简化起见，在指定软件包版本要求时避免包括默认的插入符号。
 
 ```julia
 # Yes:
@@ -815,10 +815,10 @@ DataFrames = "0.17"
 DataFrames = "^0.17"
 ```
 
-- For accuracy, do not use constructs like `>=` to avoid upper bounds.
-- Every dependency should have a bound.
-- All packages should use [CompatHelper](https://github.com/JuliaRegistries/CompatHelper.jl) and attempt to stay up to date with the dependencies.
-- The lower bound on dependencies should be the last tested version.
+- 为了保证准确性，请不要使用诸如 `>=` 之类的结构来避免上界。
+- 每个依赖都应该有一个绑定。
+- 所有包都应该使用 [CompatHelper](https://github.com/JuliaRegistries/CompatHelper.jl) 并努力与依赖保持最新。
+- 依赖关系的下限应该是最后的测试版本。
 
 ### 文档
 
@@ -898,9 +898,9 @@ function mysearch(array::AbstractArray{T}, val::T) where {T}
 end
 ```
 
-- The `@doc doc""" """` formulation from the Markdown standard library should be used whenever there is LaTeX.
+- 只要有 LaTeX 语句，就应该使用 Markdown 标准库中的 `@doc doc“”“”“` 方法。
 - 只有公共类型的字段必须进行文档记录。 未记录的字段被视为非公开的内部内容。
-- If your method contains lots of arguments or keywords, you may want to exclude them from the method signature on the first line and instead use `args...` and/or `kwargs...`.
+- 如果您的方法包含大量的参数或关键字，您可能希望在第一行方法签名中将它们排除在外，换而使用 `args...` 和/或 `kwargs...`。
 
 ```julia
 """
