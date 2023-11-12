@@ -849,21 +849,21 @@ all pairs of columns of `x`.
 function bar(x, y) ...
 ```
 
-- It is recommended that you have a blank line between the headings and the content when the content is of sufficient length.
-- Try to be consistent within a docstring whether you use this additional whitespace.
-- Follow one of the following templates for types and functions when possible:
+- 当内容足够长时，建议在标题和内容之间留出一个空行。
+- 请尝试在文档字符串中保持一致，无论您是否使用了这个额外的空格。
+- 尽可能与下列模板保持一致性：
 
-Type Template (should be skipped if it is redundant with the constructor(s) docstring):
+类型模板（如果与构造函数的文档字符串重复则应跳过）：
 
 ```julia
 """
     MyArray{T, N}
 
-My super awesome array wrapper!
+我的超棒数组封装！
 
-# Fields
-- `data::AbstractArray{T, N}`: stores the array being wrapped
-- `metadata::Dict`: stores metadata about the array
+# 字段
+- `data::AbstractArray{T, N}`：存储被封装的数组
+- `metadata::Dict`：存储数组的元数据
 """
 struct MyArray{T, N} <: AbstractArray{T, N}
     data::AbstractArray{T, N}
