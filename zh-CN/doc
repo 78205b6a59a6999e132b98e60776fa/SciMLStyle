@@ -409,28 +409,28 @@ function my_large_function(argument1,
 
 The vast majority of functions will not take every kind of argument listed above; the numbers merely denote the precedence that should be used for any applicable arguments to a function.
 
-### Tests and Continuous Integration
+### 测试与持续集成
 
-- The high level `runtests.jl` file should only be used to shuttle to other test files.
-- Every set of tests should be included into a [`@safetestset`](https://github.com/YingboMa/SafeTestsets.jl). A standard `@testset` does not fully enclose all defined values, such as functions defined in a `@testset`, and thus can "leak".
-- Test includes should be written in one line, for example:
+- 高级的 `runtests.jl` 文件只应该用于传输给其他测试文件使用。
+- 每一组测试都应该包含在[`@safetestset`](https://github.com/YingboMa/SafeTestsets.jl)中。 标准的`@testset`不能完全包含所有定义的值，例如在`@testset`中定义的函数，因此可能会"泄漏"。
+- 测试包括应该写在一行中，例如：
 
 ```julia
 @time @safetestset "Jacobian Tests" include("interface/jacobian_tests.jl")
 ```
 
-- Every test script should be fully reproducible in isolation. I.e., one should be able to copy paste that script and receive the results.
+- 每个测试脚本都应该在隔离环境中完全可复现。 I.e., one should be able to copy paste that script and receive the results.
 - Test scripts should be grouped based on categories, for example tests of the interface vs tests for numerical convergence. Grouped tests should be kept in the same folder.
 - A `GROUP` environment variable should be used to specify test groups for parallel testing in continuous integration. A fallback group `All` should be used to specify all the tests that should be run when a developer runs `]test Package` locally. As an example, see the [OrdinaryDiffEq.jl test structure](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)
 - Tests should include downstream tests to major packages which use the functionality, to ensure continued support. Any update that breaks the downstream tests should follow with a notification to the downstream package of why the support was broken (preferably in the form of a PR that fixes support), and the package should be given a major version bump in the next release if the changed functionality was part of the public API.
-- CI scripts should use the default settings unless required.
-- CI scripts should test the Long-Term Support (LTS) release and the current stable release. Nightly tests are only necessary for packages with a heavy reliance on specific compiler details.
-- Any package supporting GPUs should include continuous integration for GPUs.
-- [Doctests](https://juliadocs.github.io/Documenter.jl/stable/man/doctests/) should be enabled except for the examples that are computationally-prohibitive to have as part of continuous integration.
+- 配置信息脚本应该使用默认配置，除非有必要。
+- CI脚本应该测试长期支持（LTS）版本和当前稳定版本。 每夜测试仅对特定编译器细节有严重依赖的软件包才是必要的。
+- 任何支持GPU的软件包都应该包含针对GPU的持续集成。
+- 应该启用[文档测试](https://juliadocs.github.io/Documenter.jl/stable/man/doctests/)，除了那些由于计算上的限制而不能作为持续集成的一部分的示例。
 
 ### 空格
 
-- Avoid extraneous whitespace immediately inside parentheses, square brackets or braces.
+- 避免在括号、方括号或大括号的内部出现多余的空格。
 
     ```julia
     # Yes:
@@ -440,7 +440,7 @@ The vast majority of functions will not take every kind of argument listed above
     spam( ham[ 1 ], [ eggs ] )
     ```
 
-- Avoid extraneous whitespace immediately before a comma or semicolon:
+- 避免在逗号或分号之前加入多余的空格：
 
     ```julia
     # Yes:
@@ -450,7 +450,7 @@ The vast majority of functions will not take every kind of argument listed above
     spam( ham[ 1 ], [ eggs ] )
     ```
 
-- Avoid whitespace around `:` in ranges. Use brackets to clarify expressions on either side.
+- 避免在范围 `:` 周围留有空格。 Use brackets to clarify expressions on either side.
 
     ```julia
     # Yes:
@@ -537,7 +537,7 @@ The vast majority of functions will not take every kind of argument listed above
     dophilosophy() = "Why?"
     ```
 
-- Function calls that cannot fit on a single line within the line limit should be broken up such that the lines containing the opening and closing brackets are indented to the same level while the parameters of the function are indented one level further. In most cases, the arguments and/or keywords should each be placed on separate lines. Note that this rule conflicts with the typical Julia convention of indenting the next line to align with the open bracket in which the parameter is contained. If working in a package with a different convention, follow the convention used in the package over using this guideline.
+- 无法在行限制内放置的函数调用应该被分成多行，以使包含左括号和右括号的行具有相同的缩进级别，而函数的参数则缩进一级更深。 在大多数情况下，每个参数和/或关键字应该分别放在单独的行上。 请注意，这个规则与Julia的典型约定冲突，即将下一行缩进以与包含参数的开放括号对齐。 如果在与不同惯例的软件包中工作，请遵循软件包中使用的惯例，而不是使用本指南。
 
     ```julia
     # Yes:
@@ -556,7 +556,7 @@ The vast majority of functions will not take every kind of argument listed above
                              unique_conic_forms)
     ```
 
-- Group similar one line statements together.
+- 将类似的一行语句分组在一起。
 
     ```julia
     # Yes:
@@ -572,7 +572,7 @@ The vast majority of functions will not take every kind of argument listed above
     baz = 3
     ```
 
-- Use blank-lines to separate different multi-line blocks.
+- 请使用空行分隔不同的多行文本块。
 
     ```julia
     # Yes:
@@ -592,7 +592,7 @@ The vast majority of functions will not take every kind of argument listed above
         println(i)
     end
     ```
-- After a function definition, and before an end statement do not include a blank line.
+- 定义完一个函数后，在一个结束语句前面请不要加入空行。
 
     ```julia
     # Yes:
@@ -613,7 +613,7 @@ The vast majority of functions will not take every kind of argument listed above
     end
     ```
 
-- Use line breaks between control flow statements and returns.
+- 在控制流语句和返回语句之间使用换行符。
 
     ```julia
     # Yes:
@@ -665,7 +665,7 @@ xy = (;x=1,y=2)
 3.f0
 ```
 
-- Always prefer the type `Int` to `Int32` or `Int64` unless one has a specific reason to choose the bit size.
+- 始终优先选择类型 `Int` 而不是 `Int32` 或 `Int64`，除非有特定原因选择位大小。
 
 ### 三元操作符
 
@@ -745,7 +745,7 @@ julia> splicer([3.0, 5, 7, 9], 2)
 
 ### 结构类型标记
 
-Annotations on type fields need to be given a little more thought, since field access is not concrete unless the compiler can infer the type (see [type-dispatch design](https://www.stochasticlifestyle.com/type-dispatch-design-post-object-oriented-programming-julia/) for details). Since well-inferred code is preferred, abstract type annotations, i.e.
+对类型字段的注释需要更加深思熟虑，因为除非编译器可以推断出类型，否则字段访问是不确定的（有关详细信息，请参见[类型调度设计](https://www.stochasticlifestyle.com/type-dispatch-design-post-object-oriented-programming-julia/)）。 由于很好推断的代码比较受欢迎，所以首选抽象类型注释，即。
 
 ```julia
 mutable struct MySubString <: AbstractString
@@ -775,7 +775,7 @@ mutable struct MySubString{T<:Integer} <: AbstractString
 end
 ```
 
-Untyped fields should be explicitly typed `Any`, i.e.:
+未指定类型的字段应明确指定为 `Any`，即：
 
 ```julia
 struct StructA
@@ -799,8 +799,8 @@ No:
 ### 类型与类型标记
 
 - 避免使用复杂的 union 类型。 `Vector{Union{Int,AbstractString,Tuple,Array}}` 应该改为 `Vector{Any}`。 这将减少编译检查许多分支时的额外压力。
-- 分支拆分时，应只保留两到三种类型的 Unions. Unions of three types should be kept to a minimum for compile times.
-- Do not use `===` to compare types. Use `isa` or `<:` instead.
+- 分支拆分时，应只保留两到三种类型的 Unions. 应该尽量减少编译时间，保持三个类型的联合体最少。
+- 不要使用 `===` 来比较类型。 请使用 `isa` 或 `<:` 来替代。
 
 ### 软件包版本规范
 
@@ -843,8 +843,7 @@ DataFrames = "^0.17"
 """
     bar(x[, y])
 
-Compute the Bar index between `x` and `y`. If `y` is missing, compute the Bar index between
-all pairs of columns of `x`.
+计算 Bar index between `x` and `y`. 如果 `y` 的值是 missing，
 """
 function bar(x, y) ...
 ```
