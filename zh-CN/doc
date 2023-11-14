@@ -8,10 +8,10 @@ SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciM
 - [SciML Julia 风格指南](#sciml-style-guide-for-julia)
   - [代码风格徽章](#code-style-badge)
   - [SciML 风格的总体原则](#overarching-dogmas-of-the-sciml-style)
-    - [一致性与约定](#consistency-vs-adherence)
+    - [更新一致或因循守旧](#consistency-vs-adherence)
     - [社区贡献准则](#community-contribution-guidelines)
     - [开源贡献是从小到大的历练](#open-source-contributions-are-allowed-to-start-small-and-grow-over-time)
-    - [使用通用化的代码](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
+    - [优先使用通用化的代码](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
     - [尽可能匹配用户使用的类型](#internal-types-should-match-the-types-used-by-users-when-possible)
     - [尽可能使用合适的 Trait 及通用的接口](#trait-definition-and-adherence-to-generic-interface-is-preferred-when-possible)
     - [仅在作为语法糖的情况下使用宏](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
@@ -111,7 +111,7 @@ end
 
 如果 `f(A)` 以某些集合作为输入，并使用这些集合的内容进行计算。那么，理想情况下，如果用户传入的 `A` 是一个 `Array` 对象，那么函数内的计算应该通过 `Array` 进行。 如果 `A` 是一个 `CuArray` 对象，那么应该使用 `CuArray` 进行计算（或在不支持的情况下抛出错误）。 因此，在你编写 `f` 时，使用类似 `similar(A)` 的通用方法构建数组，优于使用诸如 `Array(undef,size(A))` 这类非通用的构造函数。除非你明确这个函数在文档中已经说明了它的不通用性。
 
-### 尽可能使用 Trait 定义并遵循通用的接口
+### 尽可能使用合适的 Trait 及通用的接口
 
 Julia 提供了许多不同的接口，例如：
 
@@ -121,13 +121,13 @@ Julia 提供了许多不同的接口，例如：
 
 应该尽可能使用这些接口。 例如，在定义广播重载时，应按照文档的建议实现 `BroadcastStyle`，而不是通过 `copyto!` 重载来绕过广播机制。
 
-当缺少接口函数时，应该把相关功能的函数添加到 Base Julia 中或创建一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的一样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要数组可变，应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善的错误信息（或者提供一个不要求可变的代码版本）。
+当缺少接口函数时，应该把相关功能的函数添加到 Base Julia 中或创建一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的一样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要修改数组，应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善的错误信息（或者提供一个不要求可变的代码版本）。
 
 举个例子：雅可比（Jacobian）矩阵的生成。 在许多科研领域的应用，可能需要从用户输入的 `u0` 中生成雅可比（Jacobian）缓存。 你可能天真地以为，可以用 `J = similar(u0, length(u0), length(u0))` 生成雅可比（Jacobian）矩阵。 但这样生成的雅可比（Jacobian） 矩阵 J 却会是一个 Matrix 类型的矩阵
 
-### 仅在作为语法糖的情况下使用宏
+### 仅在将其作为语法糖的情况下使用宏
 
-宏定义了新的语法，因此它们往往比其他编码风格更难以组合，并且需要事先熟悉才能理解。 你应该拷问自己：你能否让你的阅读者想象出你生成了什么代码？ 例如，Soss.jl 的用户可能不知道以下代码生成了什么：
+宏定义了新的语法，因此它们不但使代码与其他编码风格更难组合，而且需要事先熟悉才能易于理解。 你应该拷问自己：你能否让你的阅读者想象出你生成了什么代码？ 例如，Soss.jl 的用户可能不知道以下代码生成了什么：
 
 ```julia
 @model (x, α) begin
