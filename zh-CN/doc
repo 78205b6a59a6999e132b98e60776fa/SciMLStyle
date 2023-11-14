@@ -245,9 +245,9 @@ map(v -> v[i], vector_of_vectors)
 
 ### 尽可能重复使用代码
 
-如果一个软件包里含有一个你需要的函数，那就使用这个软件包， 并将其作为一个依赖。 如果该函数缺少某个功能，建议为该软件包添加这个功能，再把它作为依赖。 如果这个依赖有一些潜在的问题，比如它的加载速度很慢，你应该考虑帮助该软件包解决这个问题，最后再将它作为依赖。 只有你不可能帮助这个包变得“足够好”的情况下，你才应该放弃使用它。 如果你放弃了一个包，你应该考虑为你所需要的功能构建一个新的包。
+如果一个软件包里含有一个你需要的函数，那就使用这个软件包， 并将其作为一个依赖。 如果该函数缺少某个功能，建议为该软件包添加这个功能，再把它作为依赖。 如果这个依赖有一些潜在的问题，比如它的加载速度很慢，你应该考虑帮助该软件包解决这个问题，最后再将它作为依赖。 只有你不可能帮助这个包变得“够好用”的情况下，你才应该放弃使用它。 如果你放弃了这个包，你应该考虑为你所需要的功能构建一个新的包。
 
-### 尽可能避免遮蔽函数
+### 尽可能避免隐藏函数
 
 在 Julia 中，在不同命名空间里的两个函数可以使用相同的函数名。 例如，`X.f` 和 `Y.f` 是两个不同的函数，具有不同的调用方式，但名称却相同。 当然，这种情况应该尽可能避免。 比起创建一个 `MyPackage.sort`，当你想要添加的新用法符合基本函数的原则时，你应该为你的类型将这些用法添加到 `Base.sort` 中。 如果不符合，考虑使用不同的函数名称。 虽然使用 `MyPackage.sort` 并不会产生冲突，但对于大多数不熟悉你的代码的人来说，这可能会令人困惑，因此考虑到一些阅读代码的新手，使用 `MyPackage.special_sort` 会更方便他人熟悉。
 
@@ -389,13 +389,13 @@ function my_large_function(argument1,
 
 1. **函数参数**。 将函数参数放在首位，允许使用 [`do`](https://docs.julialang.org/en/v1/base/base/#do) 块来传递多行匿名函数。
 
-2. **I/O 流**。 Specifying the `IO` object first permits passing the function to functions such as [`sprint`](https://docs.julialang.org/en/v1/base/io-network/#Base.sprint), e.g. `sprint(show, x)`.
+2. **I/O 流**。 首先，将`IO`对象进行指定，可以将函数传递给诸如[`sprint`](https://docs.julialang.org/en/v1/base/io-network/#Base.sprint)等函数，例如 `sprint(show, x)`。
 
-3. **Input being mutated**. 例如，在 [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!) 中，`x` 是被修改的对象，而且在要插入到 `x` 中的值之前出现。
+3. **将被修改的输入**。 例如，在 [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!) 中，`x` 是被修改的对象，而且在要插入到 `x` 中的值之前出现。
 
-4. **类型**。 传递一个类型通常意味着输出将具有给定的类型。 In [`parse(Int, "1")`](https://docs.julialang.org/en/v1/base/numbers/#Base.parse), the type comes before the string to parse. 有很多这样的例子，其中类型首先出现，但值得注意的是，在[`read(io, String)`](https://docs.julialang.org/en/v1/base/io-network/#Base.read)中，`IO`参数出现在类型之前，这与这里概述的顺序一致。
+4. **类型**。 传递一个类型通常意味着输出将具有给定的类型。 在[`parse(Int, "1")`](https://docs.julialang.org/en/v1/base/numbers/#Base.parse)中，类型应位于要解析的字符串之前。 有很多这样的例子，其中类型首先出现，但值得注意的是，在[`read(io, String)`](https://docs.julialang.org/en/v1/base/io-network/#Base.read)中，`IO`参数出现在类型之前，这与这里概述的顺序一致。
 
-5. **Input not being mutated**. In `fill!(x, v)`, `v` is *not* being mutated and it comes after `x`.
+5. **不将被修改的输入**。 在`fill!(x, v)`中，`v`在`x`之后，并且`v`是<b x-id="3">不</b>被改变的。
 
 6. **Key**。 对于关联集合，这是键 - 值对的键。 对于其他已被索引的集合，这是索引。
 
@@ -403,7 +403,7 @@ function my_large_function(argument1,
 
 8. **其他一切**。 任何其他参数。
 
-9. **可变参数**。 这是指可以在函数调用的末尾无限列举的参数。 For example, in `Matrix{T}(undef, dims)`, the dimensions can be given as a [`Tuple`](https://docs.julialang.org/en/v1/base/base/#Core.Tuple), e.g. `Matrix{T}(undef, (1,2))`, or as [`Vararg`](https://docs.julialang.org/en/v1/base/base/#Core.Vararg)s, e.g. `Matrix{T}(undef, 1, 2)`.
+9. **可变参数**。 这是指可以在函数调用的末尾无限列举的参数。 例如，在`Matrix{T}(undef, dims)`中，维度可以作为[`Tuple`](https://docs.julialang.org/en/v1/base/base/#Core.Tuple)，例如`Matrix{T}(undef, (1,2))`，或者作为[`Vararg`](https://docs.julialang.org/en/v1/base/base/#Core.Vararg)，例如`Matrix{T}(undef, 1, 2)`。
 
 10. **关键字参数**。 在Julia中，关键字参数无论如何都必须在函数定义的最后；它们在这里列出是为了完整起见。
 
@@ -421,7 +421,7 @@ function my_large_function(argument1,
 
 - 每个测试脚本都应该在隔离环境中完全可复现。 我的意思是，一个人应该能够复制粘贴这个脚本并得到结果。
 - 测试脚本应根据类别进行分组，例如接口测试与数值收敛测试。 分组的测试应该保存在同一个文件夹中。
-- 一个 `GROUP` 环境变量应该被用来在持续集成中指定用于并行测试的测试组。 A fallback group `All` should be used to specify all the tests that should be run when a developer runs `]test Package` locally. 作为一个例子，请参考[OrdinaryDiffEq.jl测试结构](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)。
+- 一个 `GROUP` 环境变量应该被用来在持续集成中指定用于并行测试的测试组。 当开发人员在本地运行`test Package`时，应使用一个后备组`All`来指定应该运行的所有测试。 作为一个例子，请参考[OrdinaryDiffEq.jl测试结构](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)。
 - 测试应该包括对使用该功能的主要软件包的下游测试，以确保持续支持。 任何导致下游测试中断的更新都应该跟随一个通知，通知下游包关于为什么支持被破坏（最好是以修复支持的PR形式），如果更改的功能属于公共API的一部分，下一次发布中该包应该被赋予主要版本升级。
 - 配置信息脚本应该使用默认配置，除非有必要。
 - CI脚本应该测试长期支持（LTS）版本和当前稳定版本。 每夜测试仅对特定编译器细节有严重依赖的软件包才是必要的。
@@ -450,7 +450,7 @@ function my_large_function(argument1,
     spam( ham[ 1 ], [ eggs ] )
     ```
 
-- 避免在范围 `:` 周围留有空格。 Use brackets to clarify expressions on either side.
+- 避免在范围 `:` 周围留有空格。 使用括号来澄清任何一侧的表述。
 
     ```julia
     # Yes:
@@ -963,7 +963,7 @@ function Manager end
 ### 报错处理
 
 - `error("string")` 应予避免。 首选是定义和抛出异常类型。 请参阅[有关异常的文档，以获取更多详细信息](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling)。
-- 尝试避免使用 `try/catch`。 Use it as minimally as possible. 应该在运行代码之前就处理好潜在问题。
+- 尝试避免使用 `try/catch`。 请尽量少用它。 应该在运行代码之前就处理好潜在问题。
 
 ### 数组
 
