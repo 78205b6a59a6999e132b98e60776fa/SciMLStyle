@@ -14,11 +14,11 @@ SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciM
     - [优先使用通用化的代码](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
     - [尽可能匹配用户使用的类型](#internal-types-should-match-the-types-used-by-users-when-possible)
     - [尽可能使用合适的 Trait 及通用的接口](#trait-definition-and-adherence-to-generic-interface-is-preferred-when-possible)
-    - [仅在作为语法糖的情况下使用宏](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
+    - [仅在将其作为语法糖的情况下使用宏](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
     - [尽可能捕获具有完善上下文的错误信息](#errors-should-be-caught-as-high-as-possible-and-error-messages-should-be-contextualized-for-newcomers)
     - [优先使用子包和接口包，而不是 Requires.jl](#subpackaging-and-interface-packages-is-preferred-over-conditional-modules-via-requiresjl)
     - [函数应减少分配内存并重用缓存，或使用不可变的输入](#functions-should-either-attempt-to-be-non-allocating-and-reuse-caches-or-treat-inputs-as-immutable)
-    - [性能足够高时，首选 Out-of-Place 和不可变性的写法](#out-of-place-and-immutability-is-preferred-when-sufficient-performant)
+    - [性能足够高时，首选 Out-of-Place 和不可变（Immutability）的写法](#out-of-place-and-immutability-is-preferred-when-sufficient-performant)
     - [测试应该囊括尽可能多的输入类型](#tests-should-attempt-to-cover-a-wide-gamut-of-input-types)
     - [子模块应该适时改写为子包或独立包](#when-in-doubt-a-submodule-should-become-a-subpackage-or-separate-package)
     - [尽可能避免使用全局作用域](#globals-should-be-avoided-whenever-possible)
@@ -127,7 +127,7 @@ Julia 提供了许多不同的接口，例如：
 
 ### 仅在将其作为语法糖的情况下使用宏
 
-宏定义了新的语法，因此它们不但使代码与其他编码风格更难组合，而且需要事先熟悉才能易于理解。 你应该拷问自己：你能否让你的阅读者想象出你生成了什么代码？ 例如，Soss.jl 的用户可能不知道以下代码生成了什么：
+宏定义了新的语法，因此它们不但使代码与其他编码风格更难组合，而且需要事先熟悉才能易于理解。 你应该拷问自己：“阅读你代码的人能够轻松想象出你生成了什么样的代码吗？” 例如，Soss.jl 的用户可能不知道以下代码生成了什么：
 
 ```julia
 @model (x, α) begin
@@ -158,7 +158,7 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 一些性能相关的宏，如 `@simd`、`@threads` 或者来自 LoopVectorization.jl 的 [`@turbo`](https://github.com/JuliaSIMD/LoopVectorization.jl) 是例外，它们生成的代码可能对大部分用户来说是陌生的。 然而，这些写法是合理的，因为它们只是语法糖：除了性能之外，它们不会（或者不应该）以可测定的方式改变程序的行为。
 
-### 尽可能捕获具有完善上下文的错误信息
+### 应该在高层捕获错误，并提供完善后的信息
 
 使用防御性编程检查潜在的错误，避免它们出现在软件包的更深层次。 例如，存在一个函数 `f(u0,p)`，如果 `u0` 的大小与 `p` 不同，函数会出错。那么你应该在函数开始时就检查这个潜在问题，并适时抛出一个该作用域的错误，指出 “参数（parameters）和初始条件（initial condition）应该大小一致”。
 
@@ -168,9 +168,9 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 尽可能地避免使用 Requires.jl。 倾向于使用你需要的某个特定的接口包。例如，要定义自动微分规则，你只需要依赖 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) 而不用依赖整个 ChainRules.jl 系统；要定义 Plots.jl 的 recipes 你只需要使用 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) 而不用使用整个 Plots.jl。
 
-否则，比起使用 Requires.jl 进行条件依赖，你应该创建一个子软件包；换句话说，在同一个 GitHub 仓库里保存一份具有独立版本控制和包管理的独立软件包。 例如，在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中，[OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
+否则，比起使用 Requires.jl 进行条件依赖，你应该创建一个子软件包；换句话说，在同一个 GitHub 仓库里保存一份具有独立版本控制和包管理的独立软件包。 例如，在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中，有 [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
 
-一些你最好要知道的接口包有：
+以下是强烈推荐你了解的接口包：
 
 - [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)
 - [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl)
@@ -182,15 +182,15 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 可变（Mutating）代码和不可变（Non-Mutating）代码仿佛是两个完全不同的世界。 当你的代码完全不可变（Immutable）时，编译器可以更好的推断依赖关系，优化代码并检查错误。 然而有些时候，充分利用可变（Mutation）的代码，甚至可以超越当今最好的编译器所生成的代码。 尽管如此，当你混合两种模式的代码时，结果会变得很糟糕。 这不只仅仅是一种编码风格的混合，还会导致潜在的非局部性（Non-locality）和编译器校验问题，这是因为这些代码没有充分利用好可变性。
 
-### 性能足够高时，首选 Out-of-Place 和不可变性的写法
+### 性能足够高时，首选 Out-of-Place 和不可变（Immutability）的写法
 
 可变性（Mutation）可以通过减少堆的分配（Heap Allocations）来提高性能， 然而，在特定情况下，如果进行堆的分配没有帮助，就不要使用可变性（Mutation）写法， 除非可变性可以带来立竿见影的效果。 例如，在矩阵足够大的情况下，`A*B` 与 `mul!(C,A,B)` 的速度是相当的，此时，更倾向于编写 `A*B`（除非函数的其他部分严格地不进行内存分配，为了一致性就应该写作 `mul!`）。
 
-类似的，除非结构（Struct）的变化是普遍需要的，否则更倾向于使用 `struct` 而不是 `mutable struct`； 即使结构（Struct）的变化是普遍的，你也要尽可能使用 [Setfield.jl](https://github.com/jw3126/Setfield.jl) 来实现。 因为编译器会对不可变（Immutable）的结构进行优化，所以不嫌麻烦的话，尽可能书写不可变的代码，这使得你的程序更加高效。
+类似的，除非结构体的变化是普遍需要的，否则更倾向于使用 `struct` 而不是 `mutable struct`； 即使改变结构体的情况很普遍，你也要尽可能使用 [Setfield.jl](https://github.com/jw3126/Setfield.jl) 来实现。 因为编译器会对不可变（Immutable）的结构体进行优化，所以不嫌麻烦的话，尽可能书写不可变的代码，这使得你的程序更加高效。
 
 ### 测试应该囊括尽可能多的输入类型
 
-如果不考虑输入类型，代码覆盖率的数字就毫无意义。 例如，你可以使用 `Array` 覆盖所有代码，但这不会检测 `CuArray` 的兼容性。 因此，类型覆盖率应该作为一个重要的覆盖率指标，而不是仅仅取决于行数。 对于数值，最好考虑以下几种类型：
+如果不考虑输入类型，代码覆盖率的数字就毫无意义。 例如，你可以使用 `Array` 覆盖所有代码，但这不会检测 `CuArray` 的兼容性。 因此，不仅是行数覆盖率，类型覆盖率也应该作为一个重要的覆盖率指标。 对于数值，最好考虑以下几种类型：
 
 - `Float64`
 - `Float32`
@@ -206,11 +206,11 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 ### 子模块应该适时改写为子包或独立包
 
-一个软件包应该只做好一件事。 如果有些代码足够独立，以至于可以单独作为一个子模块； 那么你应该考虑将它们独立出来，进行完善的测试并编写文档，以便其他包使用。
+一个软件包应该只做好一件事。 如果有些代码足够独立，以至于可以单独作为一个子模块； 那么你应该考虑将它们分离出来，进行完善的测试并编写文档，以便提供给其他包使用。
 
 ### 尽可能避免使用全局作用域
 
-尽可能避免使用全局作用域。 当不得不使用全局作用域时，全局变量应该是常量，并且用下划线隔开的大写字母命名（例如，`MY_CONSTANT`）， 并将它们的定义放在文件的开始，在导入与导出之后，在 `__init__` 函数之前。 如果你真的要使用可变（Mutable）的全局操作，你应该考虑使用可变容器（Mutable Container）。
+应尽可能避免使用全局变量。 当不得不使用全局变量时，全局变量应该是常量，并且用下划线隔开的大写字母命名（例如，`MY_CONSTANT`）， 并将它们的定义放在文件的开始，在导入与导出之后，在 `__init__` 函数之前。 如果你真的要使用可变（Mutable）的全局操作，你应该考虑使用可变容器（Mutable Container）。
 
 ### 尽可能基于类型编程并保持类型稳定
 
@@ -218,7 +218,7 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 ### 尽可能避免使用闭包
 
-闭包可能会使不稳定的类型问题难以被追踪和调试；长远来看，出于防御性编程的目的，你应该在一开始就尽可能避免使用闭包。纵使一些闭包可能不会引起问题，但这么做也可以节省时间。 类似情景也存在于阅读带有闭包的代码的过程；如果有人在追踪不稳定的类型问题，不含闭包的代码显然更方便调试。 如果你想要在外部作用域中更新变量，可以明确地使用 `Ref` 或自定义的结构（Struct）来实现。 例如：
+闭包可能会使不稳定的类型问题难以被追踪和调试；长远来看，出于防御性编程的目的，你应该在一开始就尽可能避免使用闭包。纵使一些闭包可能不会引起问题，但这么做也可以节省时间。 类似情景也存在于阅读带有闭包的代码的过程；如果有人在追踪类型不稳定的问题，不含闭包的代码显然更方便调试。 如果你想要在外部作用域中更新变量，可以明确地使用 `Ref` 或自定义的结构体来实现。 例如：
 ```julia
 map(Base.Fix2(getindex, i), vector_of_vectors)
 ```
@@ -233,11 +233,11 @@ map(v -> v[i], vector_of_vectors)
 
 ### 数值有关的功能应使用适当且通用的数值接口
 
-虽然你可以在包内使用 `A\b` 进行线性求解，但这并不意味着你应该这样做。 这个接口仅适用于执行因式分解，因此该写法降低了可扩展性、以及 `A` 的类型的兼容性。 相反，在包内的进行线性解析，应该使用 LinearSolve.jl； 同样的，非线性解析应该使用 NonlinearSolve.jl； 编码优化方面应该使用 Optimization.jl； 诸如此类。 这将给予用户完整的通用的选择，而无需再依赖每个求解器（Solver）包，其实质是在每个包内重新创建一个通用的接口。
+虽然你可以在包内使用 `A\b` 进行线性求解，但这并不意味着你应该这样做。 这个接口仅适用于执行因式分解，因此该写法降低了可扩展性、以及 `A` 的类型的兼容性。 相反，在包内进行的线性求解，应该使用 LinearSolve.jl； 同样的，非线性求解应该使用 NonlinearSolve.jl； 编码优化方面应该使用 Optimization.jl； 诸如此类。 这将给予用户完整的通用的选择，而无需再依赖每个求解器包，其实质是在每个包内重新创建一个通用的接口。
 
 ### 函数意义的原则
 
-一个函数做一件事。 每次调用 `+` 都代表着“在指定的类型上做加法”。 虽然理论上你可以添加不同含义的 `+` 用法，但在以 `+` 表示加法的通用代码语境中，这是不合适的。 为了使通用的代码运作良好，你需要考虑每个函数的意义。 每次调用函数都应该是其含义的实例化。
+一个函数只做一件事。 就好比每次调用 `+` 都代表着“在指定的类型上做加法”。 虽然理论上你可以为 `+` 添加不同含义的用法，但在用 `+` 表示加法的通用代码语境中，这是不合适的。 为了使通用的代码运作良好，你需要考虑每个函数的意义。 每次调用函数都应该是其含义的实例化。
 
 ### 尽可能将编码时的考虑作为用户可用的选项
 
@@ -259,7 +259,7 @@ map(v -> v[i], vector_of_vectors)
 
 ### 首要规则
 
-- 使用 4 个空格缩进，不使用 Tab。
+- 使用 4 个空格进行缩进，而不是使用 Tab。
 - 每行的字符应在 92 个之内。
 
 ### 通用命名原则
@@ -272,7 +272,7 @@ map(v -> v[i], vector_of_vectors)
 - 常量名称应该使用 `蛇形命名法`（全部大写）。
 - 抽象类型名称应该以 `Abstract` 开头。
 - 所有类型变量名称应该以唯一的大写字母开头，且根据语义化命名。
-- 使用完整的单词而不是缩写。
+- 优先使用完整的单词而不是它的缩写。
 - 用于表示包内部或私有的变量应该以两个下划线作为前缀，即 `__`。
 - 在为数学实体（Mathematical Entity）命名时，可以使用单个字母，因为该实体的目的和意义只有下游调用者才知道。 例如，在实现 `*(a::AbstractMatrix, b::AbstractMatrix)` 时，名称 `a` 和 `b` 都是合适的，因为这些参数的“含义”（除了作为已经由类型描述的矩阵的数学含义），只有调用者知道。
 - 在代码中使用 Unicode 来提高可读性是可以的，但在任何情况下，都不应该在公共 API 中使用 Unicode。 这是为了支持无法使用 Unicode 的终端而设定的：如果一个关键字参数必须是 η，那么在不支持 Unicode 输入的集群上使用它可能会被忽略。
