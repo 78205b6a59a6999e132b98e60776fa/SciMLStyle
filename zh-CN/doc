@@ -642,7 +642,7 @@ function my_large_function(argument1,
 # Yes:
 xy = (x = 1, y = 2)
 x = (x = 1,)  # 尾部逗号是为了保证正确所必需的。
-x = (; kwargs...)  # Semicolon required to splat correctly.
+x = (; kwargs...) # 需要分号才能正确拆分。
 
 # No:
 xy = (x=1, y=2)
@@ -731,7 +731,7 @@ splicer(arr::AbstractArray, step::Integer) = arr[begin:step:end]
 splicer(arr::Array{Int}, step::Int) = arr[begin:step:end]
 ```
 
-尽可能使用尽可能多的通用类型，可以允许多种输入，并使您的代码更加通用。
+尽可能使用尽可能多的通用类型，使函数可以允许多种输入，并使您的代码更加通用：
 
 ```julia
 julia> splicer(1:10, 2)
@@ -755,7 +755,7 @@ mutable struct MySubString <: AbstractString
 end
 ```
 
-是不推荐的。 相反，一个使用具体类型的结构体：
+是不推荐的。 相反，使用具体类型的结构体：
 
 ```julia
 mutable struct MySubString <: AbstractString
@@ -798,14 +798,14 @@ No:
 
 ### 类型与类型标记
 
-- 避免使用复杂的 union 类型。 `Vector{Union{Int,AbstractString,Tuple,Array}}` 应该改为 `Vector{Any}`。 这将减少编译检查许多分支时的额外压力。
-- 分支拆分时，应只保留两到三种类型的 Unions. 应该尽量减少编译时间，保持三个类型的联合体最少。
+- 避免使用复杂的 union 类型。 `Vector{Union{Int,AbstractString,Tuple,Array}}` 应该改为 `Vector{Any}`。 这将减少编译检查过多分支时造成的额外压力。
+- 分支拆分时，应只保留两到三种类型的 Unions. 只有三种类型的 Unions 一般能将编译时间减少到最小。
 - 不要使用 `===` 来比较类型。 请使用 `isa` 或 `<:` 来替代。
 
 ### 软件包版本规范
 
 - 使用[语义化版本控制](https://semver.org/)
-- 为了简化起见，在指定软件包版本要求时避免包括默认的插入符号。
+- 为了简洁起见，在指定软件包依赖版本时避免写入默认的插入符号。
 
 ```julia
 # Yes:
