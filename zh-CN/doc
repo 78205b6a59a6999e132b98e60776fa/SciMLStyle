@@ -393,7 +393,7 @@ function my_large_function(argument1,
 
 3. **将被修改的输入**。 例如，在 [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!) 中，`x` 是被修改的对象，而且在要插入到 `x` 中的值之前出现。
 
-4. **类型**。 传递一个类型通常意味着输出将具有给定的类型。 在 [`parse(Int, "1")`](https://docs.julialang.org/en/v1/base/numbers/#Base.parse) 中，类型应位于要解析的字符串之前。 类型在最前方的例子有很多，但值得注意的是，在 [`read(io, String)`](https://docs.julialang.org/en/v1/base/io-network/#Base.read) 中，`IO` 参数出现在类型之前，这与本段概述的顺序一致。
+4. **类型**。 传入何种类型通常意味着函数将输出何种类型。 在 [`parse(Int, "1")`](https://docs.julialang.org/en/v1/base/numbers/#Base.parse) 中，类型应位于要解析的字符串之前。 类型在出现最前方的例子有很多，不过需要注意的是，在 [`read(io, String)`](https://docs.julialang.org/en/v1/base/io-network/#Base.read) 中，`IO` 参数出现在类型之前，这与本段概述的优先级顺序一致。
 
 5. **不将被修改的输入**。 在 `fill!(x, v)` 中，`v` 在 `x` 之后，并且 <0>v</0> 是 *不* 被改变的。
 
@@ -403,7 +403,7 @@ function my_large_function(argument1,
 
 8. **其他一切**。 任何其他参数。
 
-9. **可变参数**。 这是指可以在函数调用的末尾无限列举的参数。 例如，在 `Matrix{T}(undef, dims)` 中，维度可以作为 [`Tuple`](https://docs.julialang.org/en/v1/base/base/#Core.Tuple)，例如 `Matrix{T}(undef, (1,2))`，或者作为 [`Vararg`](https://docs.julialang.org/en/v1/base/base/#Core.Vararg)，例如 `Matrix{T}(undef, 1, 2)`。
+9. **可变参数**。 这是指可以在函数调用的末尾无限列举的参数。 例如，在 `Matrix{T}(undef, dims)` 中，维度可以作为一个[`元组`](https://docs.julialang.org/en/v1/base/base/#Core.Tuple)存在，例如 `Matrix{T}(undef, (1,2))`，或者作为一个[`变参（元组）`](https://docs.julialang.org/en/v1/base/base/#Core.Vararg)存在，例如 `Matrix{T}(undef, 1, 2)`。
 
 10. **关键字参数**。 在Julia中，关键字参数无论如何都必须在函数定义的最后；它们在这里列出是为了完整起见。
 
@@ -411,17 +411,17 @@ function my_large_function(argument1,
 
 ### 测试与持续集成
 
-- 高层级的 `runtests.jl` 文件只应该用于传输给其他测试文件使用。
-- 每一组测试都应该包含在[`@safetestset`](https://github.com/YingboMa/SafeTestsets.jl)中。 标准的`@testset`不能完全包含所有定义的值，例如在`@testset`中定义的函数，因此可能会"泄漏"。
-- 测试的 include 应该写在同一行中，例如：
+- 高层级的 `runtests.jl` 文件只应该用于切换到其他不同测试文件。
+- 每一组测试都应该包含在[`@safetestset`](https://github.com/YingboMa/SafeTestsets.jl)中。 标准的`@testset`不能完全包含所有定义的值，例如在`@testset`中定义的函数，可能会因此导致"泄漏"。
+- 测试用的 include 应该写在一行中，例如：
 
 ```julia
 @time @safetestset "Jacobian Tests" include("interface/jacobian_tests.jl")
 ```
 
 - 每个测试脚本都应该是可以独立运行并且结果完全可复现的。 也就是说，能够复制该脚本并得到相同结果。
-- 测试脚本应根据类别进行分组，例如接口测试与数值收敛测试。 分组的测试脚本应该保存在同一个文件夹中。
-- 一个 `GROUP` 环境变量应该被用来在持续集成中指定用于并行测试的测试组。 当开发人员在本地运行 `test Package` 时，应使用一个后备组 `All` 来指定应该运行的所有测试。 作为一个例子，请参考[OrdinaryDiffEq.jl测试结构](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)。
+- 测试脚本应根据类别进行分组，例如接口测试与数值收敛测试各为一组。 分组后的测试脚本应该保存在同一个文件夹中。
+- `GROUP` 环境变量应该被用来指定在持续集成中进行并行测试的测试组。 当开发人员在本地运行 `test Package` 时，应使用一个后备组 `All` 来指定应该运行的所有测试。 作为一个例子，请参考[OrdinaryDiffEq.jl测试结构](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)。
 - 测试应该包括对使用该功能的主要软件包的下游测试，以确保持续支持。 任何导致下游测试中断的更新都应该跟随一个通知，通知下游包关于为什么支持被破坏（最好是以修复支持的PR形式），如果更改的功能属于公共API的一部分，下一次发布中该包应该被赋予主要版本升级。
 - 配置信息脚本应该使用默认配置，除非有必要。
 - CI脚本应该测试长期支持（LTS）版本和当前稳定版本。 每夜测试仅对特定编译器细节有严重依赖的软件包才是必要的。
