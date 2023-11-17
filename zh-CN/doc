@@ -15,7 +15,7 @@ SciML 风格指南是适用于 Julia 编程语言的风格指南。 它被 [SciM
     - [尽可能匹配用户使用的类型](#internal-types-should-match-the-types-used-by-users-when-possible)
     - [尽可能使用合适的 Trait 及通用的接口](#trait-definition-and-adherence-to-generic-interface-is-preferred-when-possible)
     - [仅在将其作为语法糖的情况下使用宏](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
-    - [尽可能捕获具有完善上下文的错误信息](#errors-should-be-caught-as-high-as-possible-and-error-messages-should-be-contextualized-for-newcomers)
+    - [应该在高层捕获错误，并提供完善后的信息](#errors-should-be-caught-as-high-as-possible-and-error-messages-should-be-contextualized-for-newcomers)
     - [优先使用子包和接口包，而不是 Requires.jl](#subpackaging-and-interface-packages-is-preferred-over-conditional-modules-via-requiresjl)
     - [函数应减少分配内存并重用缓存，或使用不可变的输入](#functions-should-either-attempt-to-be-non-allocating-and-reuse-caches-or-treat-inputs-as-immutable)
     - [性能足够高时，首选 Out-of-Place 和不可变（Immutability）的写法](#out-of-place-and-immutability-is-preferred-when-sufficient-performant)
