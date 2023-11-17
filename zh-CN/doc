@@ -421,11 +421,11 @@ function my_large_function(argument1,
 
 - 每个测试脚本都应该是可以独立运行并且结果完全可复现的。 也就是说，能够复制该脚本并得到相同结果。
 - 测试脚本应根据类别进行分组，例如接口测试与数值收敛测试各为一组。 分组后的测试脚本应该保存在同一个文件夹中。
-- `GROUP` 环境变量应该被用来指定在持续集成中进行并行测试的测试组。 当开发人员在本地运行 `test Package` 时，应使用一个后备组 `All` 来指定应该运行的所有测试。 作为一个例子，请参考[OrdinaryDiffEq.jl测试结构](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)。
-- 测试应该包括对使用该功能的主要软件包的下游测试，以确保持续支持。 任何导致下游测试中断的更新都应该跟随一个通知，通知下游包关于为什么支持被破坏（最好是以修复支持的PR形式），如果更改的功能属于公共API的一部分，下一次发布中该包应该被赋予主要版本升级。
-- 配置信息脚本应该使用默认配置，除非有必要。
+- `GROUP` 环境变量应该被用来指定在持续集成中进行并行测试的测试组。 当开发人员在本地运行 `]test Package` 时，应有一个回退组 `All` 来指定所有应该被运行的测试。 可以参考 [OrdinaryDiffEq.jl 的测试结构](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)来作为案例。
+- 测试应该包括对使用该功能的下游主要软件包的测试，以确保持续支持下游软件包。 任何破坏下游测试的更新都应向下游软件包发出通知，说明支持被破坏的原因（最好以修复支持的PR的形式），如果更改的功能是公共API的一部分，则应在下一版本中对软件包进行重大版本升级。
+- 配置信息脚本应该使用默认配置，除非有特殊需求。
 - CI脚本应该测试长期支持（LTS）版本和当前稳定版本。 每夜测试仅对特定编译器细节有严重依赖的软件包才是必要的。
-- 任何支持GPU的软件包都应该包含针对GPU的持续集成。
+- 任何支持 GPU 的软件包都应该包含针对 GPU 的持续集成。
 - 应该启用[文档测试](https://juliadocs.github.io/Documenter.jl/stable/man/doctests/)，除了那些由于计算上的限制而不能作为持续集成的一部分的示例。
 
 ### 空格
@@ -483,7 +483,7 @@ function my_large_function(argument1,
     long_variable = 3
     ```
 
-- 在大多数二进制运算符的两侧加上一个空格：赋值运算符（`=`），更新运算符（`+=`，`-=`等），数值比较运算符（`==`，`<`，`>`，`!=`等），lambda 运算符（`->`）。 不包括以下二元运算符： [范围运算符 ](https://docs.julialang.org/en/v1/base/math/#Base.::)（`:`）、 [有理数运算符](https://docs.julialang.org/en/v1/base/math/#Base.://) （`//`）、[指数运算符](https://docs.julialang.org/en/v1/base/math/#Base.:^-Tuple{Number,%20Number})（`^`）以及[可选参数/关键字](https://docs.julialang.org/en/v1/manual/functions/#Optional-Arguments-1)（例如 `f(x = 1; y = 2)`）。请勿将这些运算符包含在本准则中。
+- 在大多数二进制运算符的两侧加上一个空格：赋值运算符（`=`），[更新运算符](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Updating-operators-1)（`+=`，`-=` 等），[数值比较运算符](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Numeric-Comparisons-1)（`==`，`<`，`>`，`!=` 等），[lambda 运算符](https://docs.julialang.org/en/v1/manual/functions/#man-anonymous-functions-1)（`->`）。 不包括以下二元运算符： [范围运算符 ](https://docs.julialang.org/en/v1/base/math/#Base.::)（`:`）、 [有理数运算符](https://docs.julialang.org/en/v1/base/math/#Base.://) （`//`）、[指数运算符](https://docs.julialang.org/en/v1/base/math/#Base.:^-Tuple{Number,%20Number})（`^`）以及[可选参数/关键字](https://docs.julialang.org/en/v1/manual/functions/#Optional-Arguments-1)（例如 `f(x = 1; y = 2)`）。请勿将这些运算符包含在本准则中。
 
     ```julia
     # Yes:
@@ -513,7 +513,7 @@ function my_large_function(argument1,
 
     ```julia
     # Yes:
-    # Note: an empty line before the first long-form `domaths` method is optional.
+    # 注意：在第一个长格式 `domaths` 方法之前加入一行空行是可选的。
     domaths(x::Number) = x + 5
     domaths(x::Int) = x + 10
     function domaths(x::String)
@@ -537,7 +537,7 @@ function my_large_function(argument1,
     dophilosophy() = "Why?"
     ```
 
-- 无法在行限制内放置的函数调用应该被分成多行，以使包含左括号和右括号的行具有相同的缩进级别，而函数的参数则缩进一级更深。 在大多数情况下，每个参数和/或关键字应该分别放在单独的行上。 请注意，这个规则与Julia的典型约定冲突，即将下一行缩进以与包含参数的开放括号对齐。 如果在与不同惯例的软件包中工作，请遵循软件包中使用的惯例，而不是使用本指南。
+- 超过单行字符限制的函数调用应该被分成多行，以使包含左括号和右括号的行具有相同的缩进，而函数的参数则再缩进一级。 在大多数情况下，每个参数和/或关键字应该分别放在不同的行上。 请注意，这个规则与 Julia 的典型约定冲突，即，与缩进下一行以与包含参数的开放括号对齐这一点冲突。 如果你为具有不同规约的程序包编写代码，请遵循软件包中使用的规约，而不是使用本指南。
 
     ```julia
     # Yes:
@@ -641,7 +641,7 @@ function my_large_function(argument1,
 ```julia
 # Yes:
 xy = (x = 1, y = 2)
-x = (x = 1,)  # Trailing comma required for correctness.
+x = (x = 1,)  # 尾部逗号是为了保证正确所必需的。
 x = (; kwargs...)  # Semicolon required to splat correctly.
 
 # No:
