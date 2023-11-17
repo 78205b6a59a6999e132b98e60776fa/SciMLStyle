@@ -241,11 +241,11 @@ map(v -> v[i], vector_of_vectors)
 
 ### 尽可能将编码时的考虑作为用户可用的选项
 
-你应该尽可能地将你在编程时考虑的多种数值和方法，作为代码的选项暴露给用户使用。 这可能会带来一些意想不到的代码的重复使用。
+你应该尽可能地将你在编程时考虑的多种数值和方法，作为代码的选项暴露给用户使用。 这可能会带来一些意想不到的代码的重复利用。
 
 ### 尽可能重复使用代码
 
-如果一个软件包里含有一个你需要的函数，那就使用这个软件包， 并将其作为一个依赖。 如果该函数缺少某个功能，建议为该软件包添加这个功能，再把它作为依赖。 如果这个依赖有一些潜在的问题，比如它的加载速度很慢，你应该考虑帮助该软件包解决这个问题，最后再将它作为依赖。 只有你不可能帮助这个包变得“够好用”的情况下，你才应该放弃使用它。 如果你放弃了这个包，你应该考虑为你所需要的功能构建一个新的包。
+如果一个软件包里含有一个你需要的函数，那就使用这个软件包， 并将其作为一个依赖。 如果该函数缺少某个功能，建议为该软件包添加这个功能，再把它作为依赖。 如果这个依赖有一些潜在的问题，比如它的加载速度很慢，你应该考虑帮助该软件包解决这个问题，最后再将它作为依赖。 只有你不可能帮助这个包变得“足够好用”的情况下，你才应该放弃使用它。 如果你放弃了这个包，你应该考虑为你所需要的功能构建一个新的包。
 
 ### 尽可能避免遮蔽函数
 
@@ -253,7 +253,7 @@ map(v -> v[i], vector_of_vectors)
 
 ### 不使用不再维护的依赖
 
-只有当包的维护者能够及时作出响应时，才应该依赖于这些包。 好的代码需要好的社区。 如果它的维护者在被多次提醒时，两周内仍未对问题做出任何回应，那么应该考虑移除所使用的该组织的所有依赖项。 注意，有些问题可能需要远超两周的时间才能解决，重要的维护者要保持沟通的开放性、一致性和及时性。
+只有当包的维护者能够及时作出响应时，才应该依赖于这些包。 好的代码需要好的社区。 如果它的维护者在被多次提醒后，两周内仍未对问题做出任何回应，那么应该考虑移除所使用的该组织的所有依赖项。 注意，有些问题可能需要远超两周的时间才能解决，重要的是维护者要保持沟通的开放性、一致性和及时性。
 
 ## 具体规则
 
@@ -275,7 +275,7 @@ map(v -> v[i], vector_of_vectors)
 - 优先使用完整的单词而不是它的缩写。
 - 用于表示包内部或私有的变量应该以两个下划线作为前缀，即 `__`。
 - 在为数学实体（Mathematical Entity）命名时，可以使用单个字母，因为该实体的目的和意义只有下游调用者才知道。 例如，在实现 `*(a::AbstractMatrix, b::AbstractMatrix)` 时，名称 `a` 和 `b` 都是合适的，因为这些参数的“含义”（除了作为已经由类型描述的矩阵的数学含义），只有调用者知道。
-- 在代码中使用 Unicode 来提高可读性是可以的，但在任何情况下，都不应该在公共 API 中使用 Unicode。 这是为了支持无法使用 Unicode 的终端而设定的：如果一个关键字参数必须是 η，那么在不支持 Unicode 输入的集群上使用它可能会被忽略。
+- 可以在代码中使用 Unicode 来提高可读性，但在任何情况下，都不应该在公共 API 中使用 Unicode。 这是为了支持无法使用 Unicode 的终端而设定的：如果一个关键字参数必须是 η，那么在不支持 Unicode 输入的集群上使用它可能会被忽略。
 
 ### 注释
 
@@ -513,7 +513,7 @@ function my_large_function(argument1,
 
     ```julia
     # Yes:
-    # 注意：在第一个长格式 `domaths` 方法之前加入一行空行是可选的。
+    # Note: an empty line before the first long-form `domaths` method is optional.
     domaths(x::Number) = x + 5
     domaths(x::Int) = x + 10
     function domaths(x::String)
@@ -641,8 +641,8 @@ function my_large_function(argument1,
 ```julia
 # Yes:
 xy = (x = 1, y = 2)
-x = (x = 1,)  # 尾部逗号是为了保证正确所必需的。
-x = (; kwargs...) # 需要分号才能正确拆分。
+x = (x = 1,)  # Trailing comma required for correctness.
+x = (; kwargs...)  # Semicolon required to splat correctly.
 
 # No:
 xy = (x=1, y=2)
@@ -815,9 +815,9 @@ DataFrames = "0.17"
 DataFrames = "^0.17"
 ```
 
-- 为了保证准确性，请不要使用诸如 `>=` 之类的结构来避免上界。
-- 每个依赖都应该有一个绑定。
-- 所有包都应该使用 [CompatHelper](https://github.com/JuliaRegistries/CompatHelper.jl) 并努力与依赖保持最新。
+- 为了保证准确性，请不要使用诸如 `>=` 之类的结构来限制版本号。
+- 每个依赖都应该有版本锁定。
+- 所有包都应该使用 [CompatHelper](https://github.com/JuliaRegistries/CompatHelper.jl) 并始终尝试使用依赖的最新版本。
 - 依赖关系的下限应该是最后的测试版本。
 
 ### 文档
@@ -826,11 +826,11 @@ DataFrames = "^0.17"
 - 文档应该使用 [Document.jl](https://juliadocs.github.io/Documenter.jl/stable/)  来构建。
 - 教程应该写在参考材料之前。
 - 每个包都应该有一个入门教程，并且能够涵盖“90%的用例”，即包含大多数人会想要使用包的方式。
-- 教程应该展示一个完整的工作流，并明确写出该工作流各部分的操作及流程。 例如，当撰写一个关于仿真器的教程时，应该明确指出使用哪个绘图包并展示如何用其进行绘图。
-- 教程中的变量名很重要。 如果您使用 `u0`，那么所有其他代码都应使用相同的命名。 向潜在用户展示如何以正确的命名方式正确的使用您的代码。
+- 教程应该展示一个完整的工作流，并明确写出该工作流选择使用什么并如何操作。 例如，当撰写一个关于仿真器的教程时，应该明确指出使用哪个绘图包并展示如何用其进行绘图。
+- 教程中的变量名很重要。 如果您使用 `u0`，那么所有其他代码都应使用相同的命名。 好向潜在用户展示如何以正确的命名方式正确的使用您的代码。
 - 若情况合适，如何使用“高性能高级功能”的教程应该与入门教程分开。
-- 在进入 API 文档字符串的具体细节之前，所有文档都应该总结其内容。
-- 大多数模块、类型和函数应该有[文档字符串](http://docs.julialang.org/en/v1/manual/documentation/)。
+- 在开始描述 API 文档字符串的具体细节之前，所有文档都应该总结其内容。
+- 大多数模块、类型和函数应该编写[文档字符串](http://docs.julialang.org/en/v1/manual/documentation/)。
 - 文档应尽可能提供访问函数而不是相关字段的链接。 文档化后的字段是公共 API 的一部分，更改其内容/名称将构成破坏性更改。
 - 只有导出的函数才需要进行文档化。
 - 避免编写常常被重载的方法，例如 `==`。
@@ -843,13 +843,14 @@ DataFrames = "^0.17"
 """
     bar(x[, y])
 
-计算 Bar index between `x` and `y`. 如果 `y` 的值是 missing，
+Compute the Bar index between `x` and `y`. If `y` is missing, compute the Bar index between
+all pairs of columns of `x`.
 """
 function bar(x, y) ...
 ```
 
-- 当内容足够长时，建议在标题和内容之间留出一个空行。
-- 请尝试在文档字符串中保持一致，无论您是否使用了这个额外的空格。
+- 当内容足太长时，建议在标题和内容之间留出一个空行。
+- 请尝试在文档字符串中保持风格一致，无论您是否使用了这个额外的空格。
 - 尽可能遵循下列模板：
 
 类型模板（如果与构造函数的文档字符串重复则应跳过）：
@@ -858,11 +859,11 @@ function bar(x, y) ...
 """
     MyArray{T, N}
 
-我的超棒数组封装！
+My super awesome array wrapper!
 
-# 字段
-- `data::AbstractArray{T, N}`：存储被封装的数组
-- `metadata::Dict`：存储数组的元数据
+# Fields
+- `data::AbstractArray{T, N}`: stores the array being wrapped
+- `metadata::Dict`: stores metadata about the array
 """
 struct MyArray{T, N} <: AbstractArray{T, N}
     data::AbstractArray{T, N}
@@ -876,46 +877,46 @@ end
 """
     mysearch(array::MyArray{T}, val::T; verbose = true) where {T} -> Int
 
-搜索`array`中的`val`。
-""" 出于某种原因，我们不想使用Julia内置的搜索功能 :)
+Searches the `array` for the `val`. For some reason we don't want to use Julia's
+builtin search :)
 
-# 参数
-- `array::MyArray{T}`：要搜索的数组
-- `val::T`：要搜索的值
+# Arguments
+- `array::MyArray{T}`: the array to search
+- `val::T`: the value to search for
 
-# 关键词
-- `verbose::Bool = true`：打印进度细节
+# Keywords
+- `verbose::Bool = true`: print out progress details
 
-# 返回值
-- `Int`：`val`在`array`中的索引位置
+# Returns
+- `Int`: the index where `val` is located in the `array`
 
-# 异常
-- `NotFoundError`：如果未找到`val`，我们可以抛出一个错误。
+# Throws
+- `NotFoundError`: I guess we could throw an error if `val` isn't found.
 """
 function mysearch(array::AbstractArray{T}, val::T) where {T}
     ...
 end
 ```
 
-- 只要有 LaTeX 语句，就应该使用 Markdown 标准库中的 `@doc doc“”“”“` 方法。
+- 只要有 LaTeX 语句，就应该使用 Markdown 标准库中的 `@doc doc""" """` 语法。
 - 只能为类型的公共字段编写文档。 未编写文档的字段被视为非公开的内部内容。
 - 如果您的方法包含大量的参数或关键字，您可能希望在第一行方法签名中将它们排除在外，换而使用 `args...` 和/或 `kwargs...`。
 
 ```julia
 """
-Manager(args...; kwargs...) -> Manager
+    Manager(args...; kwargs...) -> Manager
 
-一个用于生成工作节点的集群管理器。
-"""
+A cluster manager which spawns workers.
 
-# 参数
+# Arguments
 
-- `min_workers::Int`: 最小工作进程数，否则将抛出异常
-- `max_workers::Int`: 要生成的工作进程数
+- `min_workers::Integer`: The minimum number of workers to spawn or an exception is thrown
+- `max_workers::Integer`: The requested number of workers to spawn
 
-# 关键词
+# Keywords
 
-- `definition::AbstractString`: 要使用的作业定义名称。 默认为当前实例中使用的定义。
+- `definition::AbstractString`: Name of the job definition to use. Defaults to the
+    definition used within the current instance.
 - `name::AbstractString`: ...
 - `queue::AbstractString`: ...
 """
@@ -924,7 +925,7 @@ function Manager(...)
 end
 ```
 
-- 请随意在同一个文档字符串中记录一个函数的多种方法。 但请小心，只为你已定义的函数这么做。
+- 可以随意的在同一个文档字符串中记录一个函数的多种方法。 但请只为你已定义的函数这么做。
 
 ```julia
 """
@@ -932,16 +933,17 @@ end
     Manager(min_workers:max_workers; kwargs...)
     Manager(min_workers, max_workers; kwargs...)
 
-一个生成工作进程的集群管理器。
+A cluster manager which spawns workers.
 
-# 参数
+# Arguments
 
-- `min_workers::Int`: 最小工作进程数，否则将抛出异常
-- `max_workers::Int`: 要生成的工作进程数
+- `min_workers::Int`: The minimum number of workers to spawn or an exception is thrown
+- `max_workers::Int`: The requested number of workers to spawn
 
-# 关键词
+# Keywords
 
-- `definition::AbstractString`: 要使用的作业定义名称。 默认为当前实例中使用的定义。
+- `definition::AbstractString`: Name of the job definition to use. Defaults to the
+    definition used within the current instance.
 - `name::AbstractString`: ...
 - `queue::AbstractString`: ...
 """
@@ -955,14 +957,15 @@ function Manager end
 """
 ...
 
-# 关键字
-- `definition::AbstractString`：要使用的作业定义的名称。 默认为当前实例中使用的定义。
+# Keywords
+- `definition::AbstractString`: Name of the job definition to use. Defaults to the
+    definition used within the current instance.
 """
 ```
 
 ### 报错处理
 
-- `error("string")` 应予避免。 首选是定义和抛出异常类型。 请参阅[有关异常的文档，以获取更多详细信息](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling)。
+- `error("string")` 应予避免。 尽可能定义和抛出异常类型。 请参阅[有关异常的文档，以获取更多详细信息](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling)。
 - 尝试避免使用 `try/catch`。 请尽量少用它。 应该在运行代码之前就处理好潜在问题。
 
 ### 数组
