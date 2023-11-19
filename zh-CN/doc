@@ -121,13 +121,13 @@ Julia 提供了许多不同的接口，例如：
 
 应该尽可能使用这些接口。 例如，在定义广播重载时，应按照文档的建议实现 `BroadcastStyle`，而不是通过 `copyto!` 重载来绕过广播机制。
 
-当缺少接口函数时，应该把相关功能的函数添加到 Base Julia 中或创建一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的一样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要修改数组，应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善的错误信息（或者提供一个不要求可变的代码版本）。
+当缺少接口函数时，应该把相关功能的函数添加到 Base Julia 中或额外创建一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的那样。 Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要修改数组，应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善后的错误信息（或者提供一个不要求可变的代码版本）。
 
 举个例子：雅可比（Jacobian）矩阵的生成。 在许多科研领域的应用，可能需要从用户输入的 `u0` 中生成雅可比（Jacobian）缓存。 你可能天真地以为，可以用 `J = similar(u0, length(u0), length(u0))` 生成雅可比（Jacobian）矩阵。 但这样生成的雅可比（Jacobian） 矩阵 J 却会是一个 Matrix 类型的矩阵
 
 ### 仅在将其作为语法糖的情况下使用宏
 
-宏定义了新的语法，因此它们不但使代码与其他编码风格更难组合，而且需要事先熟悉才能易于理解。 你应该拷问自己：“阅读你代码的人能够轻松想象出你生成了什么样的代码吗？” 例如，Soss.jl 的用户可能不知道以下代码生成了什么：
+宏定义了新的语法，因此它们不但使代码与其他编码风格更难组合，而且需要事先熟悉才能易于理解。 所以你应该拷问自己：“阅读你代码的人能够轻松想象出它生成了什么样的代码吗？” 例如，Soss.jl 的用户可能不知道以下代码生成了什么：
 
 ```julia
 @model (x, α) begin
@@ -140,7 +140,7 @@ Julia 提供了许多不同的接口，例如：
 end
 ```
 
-因此，尽可能不要使用这种宏作为接口。 不过，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它能[准确且高效](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)地使用递归将 `a*b + c` 转换为 `muladd(a,b,c)`），因此可以使用这样的宏，例如：
+因此，尽可能不要使用这种宏作为接口。 不过，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它能[准确且高效](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)地使用递归将 `a*b + c` 转换为 `muladd(a,b,c)`），因此可以使用这样的宏，就像这样：
 
 ```julia
 julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a032 * k2)))
@@ -166,9 +166,9 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 ### 优先使用子包和接口包，而不是 Requires.jl
 
-尽可能地避免使用 Requires.jl。 倾向于使用你需要的某个特定的接口包。例如，要定义自动微分规则，你只需要依赖 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) 而不用依赖整个 ChainRules.jl 系统；要定义 Plots.jl 的 recipes 你只需要使用 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) 而不用使用整个 Plots.jl。
+尽可能的避免使用 Requires.jl。 倾向于使用你需要的某个特定的接口包。例如，要定义自动微分规则，你只需要依赖 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) 而不用依赖整个 ChainRules.jl 系统；要定义 Plots.jl 的 recipes 你只需要使用 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) 而不用使用整个 Plots.jl。
 
-否则，比起使用 Requires.jl 进行条件依赖，你应该创建一个子软件包；换句话说，在同一个 GitHub 仓库里保存一份具有独立版本控制和包管理的独立软件包。 例如，在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中，有 [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
+否则，比起使用 Requires.jl 解决条件依赖，你应该创建一个子软件包；换句话说，在同一个 GitHub 仓库里保存一份具有独立版本控制和包管理的独立软件包。 例如，在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中，有 [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
 
 以下是强烈推荐你了解的接口包：
 
@@ -186,7 +186,7 @@ julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a03
 
 可变性（Mutation）可以通过减少堆的分配（Heap Allocations）来提高性能， 然而，在特定情况下，如果进行堆的分配没有帮助，就不要使用可变性（Mutation）写法， 除非可变性可以带来立竿见影的效果。 例如，在矩阵足够大的情况下，`A*B` 与 `mul!(C,A,B)` 的速度是相当的，此时，更倾向于编写 `A*B`（除非函数的其他部分严格地不进行内存分配，为了一致性就应该写作 `mul!`）。
 
-类似的，除非结构体的变化是普遍需要的，否则更倾向于使用 `struct` 而不是 `mutable struct`； 即使改变结构体的情况很普遍，你也要尽可能使用 [Setfield.jl](https://github.com/jw3126/Setfield.jl) 来实现。 因为编译器会对不可变（Immutable）的结构体进行优化，所以不嫌麻烦的话，尽可能书写不可变的代码，这使得你的程序更加高效。
+类似的，除非改变结构体是普遍需要的，否则更倾向于使用 `struct` 而不是 `mutable struct`； 即使改变结构体的情况很普遍，你也要尽可能使用 [Setfield.jl](https://github.com/jw3126/Setfield.jl) 来实现。 因为编译器会对不可变（Immutable）的结构体进行优化，所以不嫌麻烦的话，尽可能书写不可变的代码，这使得你的程序更加高效。
 
 ### 测试应该囊括尽可能多的输入类型
 
@@ -233,7 +233,7 @@ map(v -> v[i], vector_of_vectors)
 
 ### 数值有关的功能应使用适当且通用的数值接口
 
-虽然你可以在包内使用 `A\b` 进行线性求解，但这并不意味着你应该这样做。 这个接口仅适用于执行因式分解，因此该写法降低了可扩展性、以及 `A` 的类型的兼容性。 相反，在包内进行的线性求解，应该使用 LinearSolve.jl； 同样的，非线性求解应该使用 NonlinearSolve.jl； 编码优化方面应该使用 Optimization.jl； 诸如此类。 这将给予用户完整的通用的选择，而无需再依赖每个求解器包，其实质是在每个包内重新创建一个通用的接口。
+虽然你可以在包内使用 `A\b` 进行线性求解，但这并不意味着你应该这样做。 这个接口仅适用于执行因式分解，因此该写法降低了可扩展性、以及 `A` 的类型的兼容性。 相反，在包内进行的线性求解，应该使用 LinearSolve.jl； 同样的，非线性求解应该使用 NonlinearSolve.jl； 编码优化方面应该使用 Optimization.jl； 诸如此类。 这允许在不依赖于每个求解器包的情况下向用户提供完整的通用选择，其实质是在每个包内重新创建一个通用的接口。
 
 ### 函数意义的原则
 
@@ -247,7 +247,7 @@ map(v -> v[i], vector_of_vectors)
 
 如果一个软件包里含有一个你需要的函数，那就使用这个软件包， 并将其作为一个依赖。 如果该函数缺少某个功能，建议为该软件包添加这个功能，再把它作为依赖。 如果这个依赖有一些潜在的问题，比如它的加载速度很慢，你应该考虑帮助该软件包解决这个问题，最后再将它作为依赖。 只有你不可能帮助这个包变得“足够好用”的情况下，你才应该放弃使用它。 如果你放弃了这个包，你应该考虑为你所需要的功能构建一个新的包。
 
-### 尽可能避免遮蔽函数
+### 尽可能避免将函数遮蔽
 
 在 Julia 中，在不同命名空间里的两个函数可以使用相同的函数名。 例如，`X.f` 和 `Y.f` 是两个不同的函数，具有不同的调用方式，但名称却相同。 当然，这种情况应该尽可能避免。 比起创建一个 `MyPackage.sort`，当你想要添加的新用法符合基本函数的原则时，你应该为你的类型将这些用法添加到 `Base.sort` 中。 如果不符合，考虑使用不同的函数名称。 虽然使用 `MyPackage.sort` 并不会产生冲突，但对于大多数不熟悉你的代码的人来说，这可能会令人困惑，因此考虑到一些阅读代码的新手，使用 `MyPackage.special_sort` 会更方便他人熟悉。
 
@@ -339,10 +339,10 @@ using A,
       D
 ```
 
-- 导出的变量应该被视为公共 API 的一部分，对它们的接口的改变视为破坏性改动。
-- 任何导出变量都应该是唯一的。 换句话说，不要导出如 `f` 这样的名称，这很可能与其他代码发生冲突。
-- 包含模块定义的文件不应包含任何在该模块之外运行的代码。 也就是说，该模块应在文件开始使用关键字 `module` 声明，并在文件底部使用 `end` 结尾。 除可能存在的模块之前的文档字符外，模块的前后不应该有其他代码。 在这种情况下，模块的块内代码应该**不**缩进。
-- 某些时候出于测试或为了给枚举命名空间，需要在文件的中部声明一个子模块。 在这种情况下，模块的块内代码应该**应该**缩进。
+- 导出的变量应该被视为公共 API 的一部分，改变它们的接口将被视为破坏性改动。
+- 任何导出变量都应该是唯一的。 换句话说，不要导出诸如 `f` 这样的名称，这很可能与其他代码发生冲突。
+- 包含模块定义的文件不应包含任何在该模块之外运行的代码。 也就是说，该模块应在文件开始使用关键字 `module` 声明，并在文件底部使用 `end` 结尾。 除可能存在的模块之前的文档字符外，模块的前后不应该有其他代码。 在这种情况下，模块的块内代码**不**应该缩进。
+- 某些时候出于测试或为了给枚举命名空间，需要在文件的中部声明一个子模块。 在这种情况下，模块的块内代码**应该**缩进。
 
 ### 函数
 
