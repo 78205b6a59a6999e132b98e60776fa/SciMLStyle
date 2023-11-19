@@ -1,109 +1,93 @@
-# SciML Style Guide for Julia
+# SciML Julia 风格指南
 
-[![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
-[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/SciMLStyle/stable/)
+[![SciML 编码风格](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle) [![全局文档](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/SciMLStyle/stable/)
 
-The SciML Style Guide is a style guide for the Julia programming language. It is used by the
-[SciML Open Source Scientific Machine Learning Organization](https://sciml.ai/). As such, it is
-open to discussion with the community. Please file an issue or open a PR to discuss changes to
-the style guide.
+SciML 风格指南是适用于 Julia 编程语言的风格指南。它被 [SciML 开源科学机器学习组织](https://sciml.ai/) 所使用。因此，它在社区开放讨论。请提交一个 issue 或开启一个 PR 来讨论对该风格指南的修改。
 
-**Table of Contents**
-- [SciML Style Guide for Julia](#sciml-style-guide-for-julia)
-  - [Code Style Badge](#code-style-badge)
-  - [Overarching Dogmas of the SciML Style](#overarching-dogmas-of-the-sciml-style)
-    - [Consistency vs Adherence](#consistency-vs-adherence)
-    - [Community Contribution Guidelines](#community-contribution-guidelines)
-    - [Open source contributions are allowed to start small and grow over time](#open-source-contributions-are-allowed-to-start-small-and-grow-over-time)
-    - [Generic code is preferred unless code is known to be specific](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
-    - [Internal types should match the types used by users when possible](#internal-types-should-match-the-types-used-by-users-when-possible)
-    - [Trait definition and adherence to generic interface is preferred when possible](#trait-definition-and-adherence-to-generic-interface-is-preferred-when-possible)
-    - [Macros should be limited and only be used for syntactic sugar](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
-    - [Errors should be caught as high as possible, and error messages should be contextualized for newcomers](#errors-should-be-caught-as-high-as-possible-and-error-messages-should-be-contextualized-for-newcomers)
-    - [Subpackaging and interface packages is preferred over conditional modules via Requires.jl](#subpackaging-and-interface-packages-is-preferred-over-conditional-modules-via-requiresjl)
-    - [Functions should either attempt to be non-allocating and reuse caches, or treat inputs as immutable](#functions-should-either-attempt-to-be-non-allocating-and-reuse-caches-or-treat-inputs-as-immutable)
-    - [Out-Of-Place and Immutability is preferred when sufficient performant](#out-of-place-and-immutability-is-preferred-when-sufficient-performant)
-    - [Tests should attempt to cover a wide gamut of input types](#tests-should-attempt-to-cover-a-wide-gamut-of-input-types)
-    - [When in doubt, a submodule should become a subpackage or separate package](#when-in-doubt-a-submodule-should-become-a-subpackage-or-separate-package)
-    - [Globals should be avoided whenever possible](#globals-should-be-avoided-whenever-possible)
-    - [Type-stable and Type-grounded code is preferred wherever possible](#type-stable-and-type-grounded-code-is-preferred-wherever-possible)
-    - [Closures should be avoided whenever possible](#closures-should-be-avoided-whenever-possible)
-    - [Numerical functionality should use the appropriate generic numerical interfaces](#numerical-functionality-should-use-the-appropriate-generic-numerical-interfaces)
-    - [Functions should capture one underlying principle](#functions-should-capture-one-underlying-principle)
-    - [Internal choices should be exposed as options whenever possible](#internal-choices-should-be-exposed-as-options-whenever-possible)
-    - [Prefer code reuse over rewrites whenever possible](#prefer-code-reuse-over-rewrites-whenever-possible)
-    - [Prefer to not shadow functions](#prefer-to-not-shadow-functions)
-    - [Avoid unmaintained dependencies](#avoid-unmaintained-dependencies)
-  - [Specific Rules](#specific-rules)
-    - [High Level Rules](#high-level-rules)
-    - [General Naming Principles](#general-naming-principles)
-    - [Comments](#comments)
-    - [Modules](#modules)
-    - [Functions](#functions)
-    - [Function Argument Precedence](#function-argument-precedence)
-    - [Tests and Continuous Integration](#tests-and-continuous-integration)
-    - [Whitespace](#whitespace)
-    - [NamedTuples](#namedtuples)
-    - [Numbers](#numbers)
-    - [Ternary Operator](#ternary-operator)
-    - [For loops](#for-loops)
-    - [Function Type Annotations](#function-type-annotations)
-    - [Struct Type Annotations](#struct-type-annotations)
-    - [Macros](#macros)
-    - [Types and Type Annotations](#types-and-type-annotations)
-    - [Package version specifications](#package-version-specifications)
-    - [Documentation](#documentation)
-    - [Error Handling](#error-handling)
-    - [Arrays](#arrays)
-    - [Line Endings](#line-endings)
-    - [VS-Code Settings](#vs-code-settings)
+**目录**
+- [SciML Julia 风格指南](#sciml-style-guide-for-julia)
+  - [代码风格徽章](#code-style-badge)
+  - [SciML 风格的总体原则](#overarching-dogmas-of-the-sciml-style)
+    - [更新一致或因循守旧](#consistency-vs-adherence)
+    - [社区贡献准则](#community-contribution-guidelines)
+    - [开源贡献是从小到大的历练](#open-source-contributions-are-allowed-to-start-small-and-grow-over-time)
+    - [优先使用通用化的代码](#generic-code-is-preferred-unless-code-is-known-to-be-specific)
+    - [尽可能匹配用户使用的类型](#internal-types-should-match-the-types-used-by-users-when-possible)
+    - [尽可能使用合适的 Trait 及通用的接口](#trait-definition-and-adherence-to-generic-interface-is-preferred-when-possible)
+    - [仅在将其作为语法糖的情况下使用宏](#macros-should-be-limited-and-only-be-used-for-syntactic-sugar)
+    - [应该在高层捕获错误，并提供完善后的信息](#errors-should-be-caught-as-high-as-possible-and-error-messages-should-be-contextualized-for-newcomers)
+    - [优先使用子包和接口包，而不是 Requires.jl](#subpackaging-and-interface-packages-is-preferred-over-conditional-modules-via-requiresjl)
+    - [函数应减少分配内存并重用缓存，或使用不可变的输入](#functions-should-either-attempt-to-be-non-allocating-and-reuse-caches-or-treat-inputs-as-immutable)
+    - [性能足够高时，首选 Out-of-Place 和不可变（Immutability）的写法](#out-of-place-and-immutability-is-preferred-when-sufficient-performant)
+    - [测试应该囊括尽可能多的输入类型](#tests-should-attempt-to-cover-a-wide-gamut-of-input-types)
+    - [子模块应该适时改写为子包或独立包](#when-in-doubt-a-submodule-should-become-a-subpackage-or-separate-package)
+    - [尽可能避免使用全局作用域](#globals-should-be-avoided-whenever-possible)
+    - [尽可能基于类型编程并保持类型稳定](#type-stable-and-type-grounded-code-is-preferred-wherever-possible)
+    - [尽可能避免使用闭包](#closures-should-be-avoided-whenever-possible)
+    - [数值有关的功能应使用适当且通用的数值接口](#numerical-functionality-should-use-the-appropriate-generic-numerical-interfaces)
+    - [函数意义的原则](#functions-should-capture-one-underlying-principle)
+    - [尽可能将编码时的考虑作为用户可用的选项](#internal-choices-should-be-exposed-as-options-whenever-possible)
+    - [尽可能重复使用代码](#prefer-code-reuse-over-rewrites-whenever-possible)
+    - [尽可能避免将函数遮蔽](#prefer-to-not-shadow-functions)
+    - [不使用不再维护的依赖](#avoid-unmaintained-dependencies)
+  - [具体规则](#specific-rules)
+    - [首要规则](#high-level-rules)
+    - [通用命名原则](#general-naming-principles)
+    - [注释](#comments)
+    - [模块](#modules)
+    - [函数](#functions)
+    - [函数参数优先级](#function-argument-precedence)
+    - [测试与持续集成](#tests-and-continuous-integration)
+    - [空格](#whitespace)
+    - [命名元组](#namedtuples)
+    - [数值](#numbers)
+    - [三元操作符](#ternary-operator)
+    - [For 循环](#for-loops)
+    - [函数类型标注](#function-type-annotations)
+    - [结构类型标注](#struct-type-annotations)
+    - [宏](#macros)
+    - [类型与类型标注](#types-and-type-annotations)
+    - [软件包版本规范](#package-version-specifications)
+    - [文档](#documentation)
+    - [错误处理](#error-handling)
+    - [数组](#arrays)
+    - [行尾](#line-endings)
+    - [VS Code 设置](#vs-code-settings)
     - [JuliaFormatter](#juliaformatter)
-- [References](#references)
+- [参考](#references)
 
 
-## Code Style Badge
+## 代码风格徽章
 
-Let contributors know your project is following the SciML Style Guide by adding the badge to your `README.md`.
+在你的项目的 `README.md` 文件中加上这个徽章，让参与你项目的同伴知道此项目遵守了 SciML 代码风格！
 
 ```md
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 ```
 
-## Overarching Dogmas of the SciML Style
+## SciML 风格的总体原则
 
-### Consistency vs Adherence
+### 更新一致或因循守旧
 
-According to PEP8:
+正如 Python 的 PEP 8 所说：
 
-> A style guide is about consistency. Consistency with this style guide is important.
-> Consistency within a project is more important. Consistency within one module or function is the most important.
+> 风格指南是有关一致性的准则。代码与该风格指南保持一致性很重要，在整个项目的尺度下保持一致性更为重要，而最重要的是在一个模块或函数内保持风格的一致性。
 
-> But most importantly: know when to be inconsistent -- sometimes the style guide just doesn't apply.
-> When in doubt, use your best judgment. Look at other examples and decide what looks best. And don't hesitate to ask!
+> 此外，不可或缺的是：知晓何时打破一致性 —— 因为风格指南并非无所不能。当你陷入选择写法的困境，请仔细思考判断。参考其他案例，并采取可能最好的方案。并且，不要耻于提问！
 
-Some code within the SciML organization is old, on life support, donated by researchers to be maintained.
-Consistency is the number one goal, so updating to match the style guide should happen on a repo-by-repo
-basis, i.e. do not update one file to match the style guide (leaving all other files behind).
+SciML 组织中的有一些仍受支持的过时代码，由研究人员捐赠并加以维护。保持风格的一致性是首要目标，因此应该在整个代码库的水平上作出修改以符合风格指南，而不仅仅是更新一个文件。
 
-### Community Contribution Guidelines
+### 社区贡献准则
 
-For a comprehensive set of community contribution guidelines, refer to [ColPrac](https://github.com/SciML/ColPrac).
-A relevant point to highlight PRs should do one thing. In the context of style, this means that PRs that update
-the style of a package's code should not be mixed with fundamental code contributions. This separation makes it
-easier to ensure that large style improvements are isolated from substantive (and potentially breaking) code changes.
+你可以查看 [ColPrac](https://github.com/SciML/ColPrac) 获取完整的社区贡献指南。但需要强调的是，一个 PR 应该只做一件事。也就是，更新软件包代码风格的 PR 不应与基本代码的贡献混在一起。这种做法使得大规模的风格改进，和可能引发不定性结果的实质性代码修改，得以互不干涉。
 
-### Open source contributions are allowed to start small and grow over time
+### 开源贡献是从小到大的历练
 
-If the standard for code contributions is that every PR needs to support every possible input type that anyone can
-think of, the barrier would be too high for newcomers. Instead, the principle is to be as correct as possible to
-begin with, and grow the generic support over time. All recommended functionality should be tested, and any known
-generality issues should be documented in an issue (and with a `@test_broken` test when possible). However, a
-function that is known to not be GPU-compatible is not grounds to block merging, rather it is encouraged for a
-follow-up PR to improve the general type support!
+如果评判贡献代码好坏的标准，是任何一个 PR 都需要考虑到所有人的所有想法；那么这会在维护者和新的参与者之间划出一道鸿沟。比起严格的要求，原则上只需要在一开始尽可能做到正确，随时间推移，慢慢增加代码的通用性即可。所有建议的功能都需要通过测试，并且任何已知的普遍存在问题都需要被记录在 issue 中（如果可以的话，使用 `@test_broken` 测试）。不过，比如 PR 中存在一个不与 GPU 兼容的函数，则不能因为这个函数无法通过测试而阻止合并，相反，这将激励同伴们提交下一个 PR 来改进该函数的支持。
 
-### Generic code is preferred unless code is known to be specific
+### 优先使用通用化的代码
 
-For example, the code:
+例如以下代码：
 
 ```julia
 function f(A, B)
@@ -113,11 +97,7 @@ function f(A, B)
 end
 ```
 
-would not be preferred for two reasons. One is that it assumes `A` uses one-based indexing, which would fail in cases
-like [OffsetArrays](https://github.com/JuliaArrays/OffsetArrays.jl) and [FFTViews](https://github.com/JuliaArrays/FFTViews.jl).
-Another issue is that it requires indexing, while not all array types support indexing (for example,
-[CuArrays](https://github.com/JuliaGPU/CuArrays.jl)). A more generic and compatible implementation of this function would be
-to use broadcast, for example:
+以上写法有两个缺陷。其一，该函数假定了 `A` 使用了基于 “1” 的索引方法，而对于 [OffsetArrays](https://github.com/JuliaArrays/OffsetArrays.jl) 和 [FFTViews](https://github.com/JuliaArrays/FFTViews.jl) 的用例则会出现问题。其二，该函数需要使用索引，但并不是所有的数组类型都支持索引（例如 [CuArrays](https://github.com/JuliaGPU/CuArrays.jl)）。对此，通用且兼容性更好的实现方法是使用广播，例如：
 
 ```julia
 function f(A, B)
@@ -125,47 +105,29 @@ function f(A, B)
 end
 ```
 
-which would allow support for a wider variety of array types.
+使用广播，将支持更多的数组类型。
 
-### Internal types should match the types used by users when possible
+### 尽可能匹配用户使用的类型
 
-If `f(A)` takes the input of some collections and computes an output from those collections, then it should be
-expected that if the user gives `A` as an `Array`, the computation should be done via `Array`s. If `A` was a
-`CuArray`, then it should be expected that the computation should be internally done using a `CuArray` (or appropriately
-error if not supported). For these reasons, constructing arrays via generic methods, like `similar(A)`, is preferred when
-writing `f` instead of using non-generic constructors like `Array(undef,size(A))` unless the function is documented as
-being non-generic.
+如果 `f(A)` 以某些集合作为输入，并使用这些集合的内容进行计算。那么，理想情况下，如果用户传入的 `A` 是一个 `Array` 对象，那么函数内的计算应该通过 `Array` 进行。如果 `A` 是一个 `CuArray` 对象，那么应该使用 `CuArray` 进行计算（或在不支持的情况下抛出错误）。因此，在你编写 `f` 时，使用类似 `similar(A)` 的通用方法构建数组，优于使用诸如 `Array(undef,size(A))` 这类非通用的构造函数。除非你明确这个函数在文档中已经说明了它的不通用性。
 
-### Trait definition and adherence to generic interface is preferred when possible
+### 尽可能使用合适的 Trait 及通用的接口
 
-Julia provides many different interfaces, for example:
+Julia 提供了许多不同的接口，例如：
 
 - [Iteration](https://docs.julialang.org/en/v1/manual/interfaces/#man-interface-iteration)
 - [Indexing](https://docs.julialang.org/en/v1/manual/interfaces/#Indexing)
 - [Broadcast](https://docs.julialang.org/en/v1/manual/interfaces/#man-interfaces-broadcasting)
 
-Those interfaces should be followed when possible. For example, when defining broadcast overloads,
-one should implement a `BroadcastStyle` as suggested by the documentation instead of simply attempting
-to bypass the broadcast system via `copyto!` overloads.
+应该尽可能使用这些接口。例如，在定义广播重载时，应按照文档的建议实现 `BroadcastStyle`，而不是通过 `copyto!` 重载来绕过广播机制。
 
-When interface functions are missing, these should be added to Base Julia or an interface package,
-like [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl). Such traits should be
-declared and used when appropriate. For example, if a line of code requires mutation, the trait
-`ArrayInterface.ismutable(A)` should be checked before attempting to mutate, and informative error
-messages should be written to capture the immutable case (or, an alternative code that does not
-mutate should be given).
+当缺少接口函数时，应该把相关功能的函数添加到 Base Julia 中或额外创建一个接口包，就像 [ArrayInterface.jl](https://github.com/JuliaArrays/ArrayInterface.jl) 所做的那样。Traits 应该在合适的时候声明并使用： 例如，如果一行代码需要修改数组，应该先检查 trait `ArrayInterface.ismutable(A)`，如果该数组是不可变的，应该抛出完善后的错误信息（或者提供一个不要求可变的代码版本）。
 
-One example of this principle is demonstrated in the generation of Jacobian matrices. In many scientific
-applications, one may wish to generate a Jacobian cache from the user's input `u0`. A naive way to generate
-this Jacobian is `J = similar(u0,length(u0),length(u0))`. However, this will generate a Jacobian `J` such
-that `J isa Matrix`.
+举个例子：雅可比（Jacobian）矩阵的生成。在许多科研领域的应用，可能需要从用户输入的 `u0` 中生成雅可比（Jacobian）缓存。你可能天真地以为，可以用 `J = similar(u0, length(u0), length(u0))` 生成雅可比（Jacobian）矩阵。但这样生成的雅可比（Jacobian） 矩阵 J 却会是一个 Matrix 类型的矩阵。
 
-### Macros should be limited and only be used for syntactic sugar
+### 仅在将其作为语法糖的情况下使用宏
 
-Macros define new syntax, and for this reason, they tend to be less composable than other coding styles
-and require prior familiarity to be easily understood. One principle to keep in mind is, "can the person
-reading the code easily picture what code is being generated?". For example, a user of Soss.jl may not know
-what code is being generated by:
+宏定义了新的语法，因此它们不但使代码与其他编码风格更难组合，而且需要事先熟悉才能易于理解。所以你应该拷问自己：“阅读你代码的人能够轻松想象出它生成了什么样的代码吗？” 例如，Soss.jl 的用户可能不知道以下代码生成了什么：
 
 ```julia
 @model (x, α) begin
@@ -178,18 +140,14 @@ what code is being generated by:
 end
 ```
 
-and thus using such a macro as the interface is not preferred when possible. However, a macro like
-[`@muladd`](https://github.com/SciML/MuladdMacro.jl) is trivial to picture on a code (it recursively
-transforms `a*b + c` to `muladd(a,b,c)` for more
-[accuracy and efficiency](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)), so using
-such a macro, for example:
+因此，尽可能不要使用这种宏作为接口。不过，像 [`@muladd`](https://github.com/SciML/MuladdMacro.jl) 这样的宏在代码中很容易理解（它能[准确且高效](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation)地使用递归将 `a*b + c` 转换为 `muladd(a,b,c)`），因此可以使用这样的宏，就像这样：
 
 ```julia
 julia> @macroexpand(@muladd k3 = f(t + c3 * dt, @. uprev + dt * (a031 * k1 + a032 * k2)))
 :(k3 = f((muladd)(c3, dt, t), (muladd).(dt, (muladd).(a032, k2, (*).(a031, k1)), uprev)))
 ```
 
-is recommended. Some macros in this category are:
+我们推荐使用上述写法。同类的宏包括：
 
 - `@inbounds`
 - [`@muladd`](https://github.com/SciML/MuladdMacro.jl)
@@ -198,41 +156,21 @@ is recommended. Some macros in this category are:
 - `@.`
 - [`@..`](https://github.com/YingboMa/FastBroadcast.jl)
 
-Some performance macros, like `@simd`, `@threads`, or
-[`@turbo` from LoopVectorization.jl](https://github.com/JuliaSIMD/LoopVectorization.jl),
-make an exception in that their generated code may be foreign to many users. However, they still are
-classified as appropriate uses as they are syntactic sugar since they do (or should) not change the behavior
-of the program in measurable ways other than performance.
+一些性能相关的宏，如 `@simd`、`@threads` 或者来自 LoopVectorization.jl 的 [`@turbo`](https://github.com/JuliaSIMD/LoopVectorization.jl) 是例外，它们生成的代码可能对大部分用户来说是陌生的。然而，这些写法是合理的，因为它们只是语法糖：除了性能之外，它们不会（或者不应该）以可测定的方式改变程序的行为。
 
-### Errors should be caught as high as possible, and error messages should be contextualized for newcomers
+### 应该在高层捕获错误，并提供完善后的信息
 
-Whenever possible, defensive programming should be used to check for potential errors before they are encountered
-deeper within a package. For example, if one knows that `f(u0,p)` will error unless `u0` is the size of `p`, this
-should be caught at the start of the function to throw a domain specific error, for example "parameters and initial
-condition should be the same size".
+使用防御性编程检查潜在的错误，避免它们出现在软件包的更深层次。例如，存在一个函数 `f(u0,p)`，如果 `u0` 的大小与 `p` 不同，函数会出错。那么你应该在函数开始时就检查这个潜在问题，并适时抛出一个该作用域的错误，指出 “参数（parameters）和初始条件（initial condition）应该大小一致”。
 
-This contextualization should result in error messages that use terminology related to the user facing API (vs.
-referencing internal implementation details).  Ideally, such error messages should not only describe the
-issue in language that will be familiar to the user but also include suggestions, where possible, of how
-to correct the issue.
+你应该在错误信息中输出用户所知道的 API 术语，而不是指向内部的实现细节。在使用用户熟悉的语言描述清楚问题的同时，最好包含一些解决问题的建议。
 
-### Subpackaging and interface packages is preferred over conditional modules via Requires.jl
+### 优先使用子包和接口包，而不是 Requires.jl
 
-Requires.jl should be avoided at all costs. If an interface package exists, such as
-[ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) for defining automatic differentiation
-rules without requiring a dependency on the whole ChainRules.jl system, or
-[RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) which allows for defining Plots.jl
-plot recipes without a dependency on Plots.jl, a direct dependency on these interface packages is
-preferred.
+尽可能的避免使用 Requires.jl。倾向于使用你需要的某个特定的接口包。例如，要定义自动微分规则，你只需要依赖 [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl) 而不用依赖整个 ChainRules.jl 系统；要定义 Plots.jl 的 recipes 你只需要使用 [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl) 而不用使用整个 Plots.jl。
 
-Otherwise, instead of resorting to a conditional dependency using Requires.jl, it is
-preferred to create subpackages, i.e. smaller independent packages kept within the same Github repository
-with independent versioning and package management. An example of this is seen in
-[Optimization.jl](https://github.com/SciML/Optimization.jl) which has subpackages like
-[OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) for
-BlackBoxOptim.jl support.
+否则，比起使用 Requires.jl 解决条件依赖，你应该创建一个子软件包；换句话说，在同一个 GitHub 仓库里保存一份具有独立版本控制和包管理的独立软件包。例如，在 [Optimization.jl](https://github.com/SciML/Optimization.jl) 中，有 [OptimizationBBO.jl](https://github.com/SciML/Optimization.jl/tree/master/lib/OptimizationBBO) 这样的子软件包，用于支持 BlackBoxOptim.jl。
 
-Some important interface packages to know about are:
+以下是强烈推荐你了解的接口包：
 
 - [ChainRulesCore.jl](https://github.com/JuliaDiff/ChainRulesCore.jl)
 - [RecipesBase.jl](https://github.com/JuliaPlots/RecipesBase.jl)
@@ -240,36 +178,19 @@ Some important interface packages to know about are:
 - [CommonSolve.jl](https://github.com/SciML/CommonSolve.jl)
 - [SciMLBase.jl](https://github.com/SciML/SciMLBase.jl)
 
-### Functions should either attempt to be non-allocating and reuse caches, or treat inputs as immutable
+### 函数应减少分配内存并重用缓存，或使用不可变的输入
 
-Mutating codes and non-mutating codes fall into different worlds. When a code is fully immutable,
-the compiler can better reason about dependencies, optimize the code, and check for correctness.
-However, many times a code that makes the fullest use of mutation can outperform even what the best compilers
-of today can generate. That said, the worst of all worlds is when code mixes mutation with non-mutating
-code. Not only is this a mishmash of coding styles, but it also has the potential non-locality and compiler
-proof issues of mutating code while not fully benefiting from the mutation.
+可变（Mutating）代码和不可变（Non-Mutating）代码仿佛是两个完全不同的世界。当你的代码完全不可变（Immutable）时，编译器可以更好的推断依赖关系，优化代码并检查错误。然而有些时候，充分利用可变（Mutation）的代码，甚至可以超越当今最好的编译器所生成的代码。尽管如此，当你混合两种模式的代码时，结果会变得很糟糕。这不只仅仅是一种编码风格的混合，还会导致潜在的非局部性（Non-locality）和编译器校验问题，这是因为这些代码没有充分利用好可变性。
 
-### Out-Of-Place and Immutability is preferred when sufficient performant
+### 性能足够高时，首选 Out-of-Place 和不可变（Immutability）的写法
 
-Mutation is used to get more performance by decreasing the number of heap allocations. However,
-if it's not helpful for heap allocations in a given spot, do not use mutation. Mutation is scary
-and should be avoided unless it gives an immediate benefit. For example, if
-matrices are sufficiently large, then `A*B` is as fast as `mul!(C,A,B)`, and thus writing
-`A*B` is preferred (unless the rest of the function is being careful about being fully non-allocating,
-in which case this should be `mul!` for consistency).
+可变性（Mutation）可以通过减少堆的分配（Heap Allocations）来提高性能然而，在特定情况下，如果进行堆的分配没有帮助，就不要使用可变性（Mutation）写法除非可变性可以带来立竿见影的效果。例如，在矩阵足够大的情况下，`A*B` 与 `mul!(C,A,B)` 的速度是相当的，此时，更倾向于编写 `A*B`（除非函数的其他部分严格地不进行内存分配，为了一致性就应该写作 `mul!`）。
 
-Similarly, when defining types, using `struct` is preferred to `mutable struct` unless mutating
-the struct is a common occurrence. Even if mutating the struct is a common occurrence, see whether
-using [Setfield.jl](https://github.com/jw3126/Setfield.jl) is sufficient. The compiler will optimize
-the construction of immutable structs, and thus this can be more efficient if it's not too much of a
-code hassle.
+类似的，除非改变结构体是普遍需要的，否则更倾向于使用 `struct` 而不是 `mutable struct`； 即使改变结构体的情况很普遍，你也要尽可能使用 [Setfield.jl](https://github.com/jw3126/Setfield.jl) 来实现。因为编译器会对不可变（Immutable）的结构体进行优化，所以不嫌麻烦的话，尽可能书写不可变的代码，这使得你的程序更加高效。
 
-### Tests should attempt to cover a wide gamut of input types
+### 测试应该囊括尽可能多的输入类型
 
-Code coverage numbers are meaningless if one does not consider the input types. For example, one can
-hit all the code with `Array`, but that does not test whether `CuArray` is compatible! Thus it's
-always good to think of coverage not in terms of lines of code but in terms of type coverage. A good
-list of number types to think about are:
+如果不考虑输入类型，代码覆盖率的数字就毫无意义。例如，你可以使用 `Array` 覆盖所有代码，但这不会检测 `CuArray` 的兼容性。因此，不仅是行数覆盖率，类型覆盖率也应该作为一个重要的覆盖率指标。对于数值，最好考虑以下几种类型：
 
 - `Float64`
 - `Float32`
@@ -277,136 +198,91 @@ list of number types to think about are:
 - [`Dual`](https://github.com/JuliaDiff/ForwardDiff.jl)
 - `BigFloat`
 
-Array types to think about testing are:
+对于数组则是：
 
 - `Array`
 - [`OffsetArray`](https://github.com/JuliaArrays/OffsetArrays.jl)
 - [`CuArray`](https://github.com/JuliaGPU/CUDA.jl)
 
-### When in doubt, a submodule should become a subpackage or separate package
+### 子模块应该适时改写为子包或独立包
 
-Keep packages focused on one core idea. If there's something separate enough to be a submodule, could it
-instead be a separate, well-tested and documented package to be used by other packages? Most likely
-yes.
+一个软件包应该只做好一件事。如果有些代码足够独立，以至于可以单独作为一个子模块； 那么你应该考虑将它们分离出来，进行完善的测试并编写文档，以便提供给其他包使用。
 
-### Globals should be avoided whenever possible
+### 尽可能避免使用全局作用域
 
-Global variables should be avoided whenever possible. When required, global variables should be
-constants and have an all uppercase name separated with underscores (e.g. `MY_CONSTANT`). They should be
-defined at the top of the file, immediately after imports and exports but before an `__init__` function.
-If you truly want mutable global style behavior you may want to look into mutable containers.
+应尽可能避免使用全局变量。当不得不使用全局变量时，全局变量应该是常量，并且用下划线隔开的大写字母命名（例如，`MY_CONSTANT`）并将它们的定义放在文件的开始，在导入与导出之后，在 `__init__` 函数之前。如果你真的要使用可变（Mutable）的全局操作，你应该考虑使用可变容器（Mutable Container）。
 
-### Type-stable and Type-grounded code is preferred wherever possible
+### 尽可能基于类型编程并保持类型稳定
 
-Type-stable and type-grounded code helps the compiler create not only more optimized code, but also
-faster to compile code. Always keep containers well-typed, functions specializing on the appropriate
-arguments, and types concrete.
+基于类型编程并保持类型稳定，不仅可以使编译器生成高度优化的代码，同时也可以提高编译速度。你需要保证容器（Containers）具有准确的类型定义，保证函数只处理适当的参数，保证类型始终具体且明确。
 
-### Closures should be avoided whenever possible
+### 尽可能避免使用闭包
 
-Closures can cause accidental type instabilities that are difficult to track down and debug; in the
-long run, it saves time to always program defensively and avoid writing closures in the first place,
-even when a particular closure would not have been problematic. A similar argument applies to reading
-code with closures; if someone is looking for type instabilities, this is faster to do when code does
-not contain closures.
-Furthermore, if you want to update variables in an outer scope, do so explicitly with `Ref`s or self
-defined structs.
-For example,
+闭包可能会使不稳定的类型问题难以被追踪和调试；长远来看，出于防御性编程的目的，你应该在一开始就尽可能避免使用闭包。纵使一些闭包可能不会引起问题，但这么做也可以节省时间。类似情景也存在于阅读带有闭包的代码的过程；如果有人在追踪类型不稳定的问题，不含闭包的代码显然更方便调试。如果你想要在外部作用域中更新变量，可以明确地使用 `Ref` 或自定义的结构体来实现。例如：
 ```julia
 map(Base.Fix2(getindex, i), vector_of_vectors)
 ```
-is preferred over
+这种写法要优于以下两种：
 ```julia
 map(v -> v[i], vector_of_vectors)
 ```
-or
+或
 ```julia
 [v[i] for v in vector_of_vectors]
 ```
 
-### Numerical functionality should use the appropriate generic numerical interfaces
+### 数值有关的功能应使用适当且通用的数值接口
 
-While you can use `A\b` to do a linear solve inside a package, that does not mean that you should.
-This interface is only sufficient for performing factorizations, and so that limits the scaling
-choices, the types of `A` that can be supported, etc. Instead, linear solves within packages should
-use LinearSolve.jl. Similarly, nonlinear solves should use NonlinearSolve.jl. Optimization should use
-Optimization.jl. Etc. This allows the full generic choice to be given to the user without depending
-on every solver package (effectively recreating the generic interfaces within each package).
+虽然你可以在包内使用 `A\b` 进行线性求解，但这并不意味着你应该这样做。这个接口仅适用于执行因式分解，因此该写法降低了可扩展性、以及 `A` 的类型的兼容性。相反，在包内进行的线性求解，应该使用 LinearSolve.jl； 同样的，非线性求解应该使用 NonlinearSolve.jl； 编码优化方面应该使用 Optimization.jl； 诸如此类。这允许在不依赖于每个求解器包的情况下向用户提供完整的通用选择，其实质是在每个包内重新创建一个通用的接口。
 
-### Functions should capture one underlying principle
+### 函数意义的原则
 
-Functions mean one thing. Every dispatch of `+` should be "the meaning of addition on these types".
-While in theory you could add dispatches to `+` that mean something different, that will fail in
-generic code for which `+` means addition. Thus, for generic code to work, code needs to adhere to
-one meaning for each function. Every dispatch should be an instantiation of that meaning.
+一个函数只做一件事。就好比每次调用 `+` 都代表着“在指定的类型上做加法”。虽然理论上你可以为 `+` 添加不同含义的用法，但在用 `+` 表示加法的通用代码语境中，这是不合适的。为了使通用的代码运作良好，你需要考虑每个函数的意义。每次调用函数都应该是其含义的实例化。
 
-### Internal choices should be exposed as options whenever possible
+### 尽可能将编码时的考虑作为用户可用的选项
 
-Whenever possible, numerical values and choices within scripts should be exposed as options
-to the user. This promotes code reusability beyond the few cases the author may have expected.
+你应该尽可能地将你在编程时考虑的多种数值和方法，作为代码的选项暴露给用户使用。这可能会带来一些意想不到的代码的重复利用。
 
-### Prefer code reuse over rewrites whenever possible
+### 尽可能重复使用代码
 
-If a package has a function you need, use the package. Add a dependency if you need to. If the
-function is missing a feature, prefer to add that feature to said package and then add it as a
-dependency. If the dependency is potentially troublesome, for example because it has a high
-load time, prefer to spend time helping said package fix these issues and add the dependency.
-Only when it does not seem possible to make the package "good enough" should using the package
-be abandoned. If it is abandoned, consider building a new package for this functionality as you
-need it, and then make it a dependency.
+如果一个软件包里含有一个你需要的函数，那就使用这个软件包并将其作为一个依赖。如果该函数缺少某个功能，建议为该软件包添加这个功能，再把它作为依赖。如果这个依赖有一些潜在的问题，比如它的加载速度很慢，你应该考虑帮助该软件包解决这个问题，最后再将它作为依赖。只有你不可能帮助这个包变得“足够好用”的情况下，你才应该放弃使用它。如果你放弃了这个包，你应该考虑为你所需要的功能构建一个新的包。
 
-### Prefer to not shadow functions
+### 尽可能避免将函数遮蔽
 
-Two functions can have the same name in Julia by having different namespaces. For example,
-`X.f` and `Y.f` can be two different functions, with different dispatches, but the same name.
-This should be avoided whenever possible. Instead of creating `MyPackage.sort`, consider
-adding dispatches to `Base.sort` for your types if these new dispatches match the underlying
-principle of the function. If it doesn't, prefer to use a different name. While using `MyPackage.sort`
-is not conflicting, it is going to be confusing for most people unfamiliar with your code,
-so `MyPackage.special_sort` would be more helpful to newcomers reading the code.
+在 Julia 中，在不同命名空间里的两个函数可以使用相同的函数名。例如，`X.f` 和 `Y.f` 是两个不同的函数，具有不同的调用方式，但名称却相同。当然，这种情况应该尽可能避免。比起创建一个 `MyPackage.sort`，当你想要添加的新用法符合基本函数的原则时，你应该为你的类型将这些用法添加到 `Base.sort` 中。如果不符合，考虑使用不同的函数名称。虽然使用 `MyPackage.sort` 并不会产生冲突，但对于大多数不熟悉你的代码的人来说，这可能会令人困惑，因此考虑到一些阅读代码的新手，使用 `MyPackage.special_sort` 会更方便他人熟悉。
 
-### Avoid unmaintained dependencies
+### 不使用不再维护的依赖
 
-Packages should only be depended on if they have maintainers who are responsive. Good code requires
-good communities. If maintainers do not respond to breakage within 2 weeks with multiple notices,
-then all dependencies from that organization should be considered for removal. Note that some issues 
-may take a long time to fix, so it may take more time than 2 weeks to fix, it's simply that the 
-communication should be open, consistent, and timely. 
+只有当包的维护者能够及时作出响应时，才应该依赖于这些包。好的代码需要好的社区。如果它的维护者在被多次提醒后，两周内仍未对问题做出任何回应，那么应该考虑移除所使用的该组织的所有依赖项。注意，有些问题可能需要远超两周的时间才能解决，重要的是维护者要保持沟通的开放性、一致性和及时性。
 
-## Specific Rules
+## 具体规则
 
-### High Level Rules
+### 首要规则
 
-- Use 4 spaces per indentation level, no tabs.
-- Try to adhere to a 92 character line length limit.
+- 使用 4 个空格进行缩进，而不是使用 Tab。
+- 每行的字符应在 92 个之内。
 
-### General Naming Principles
+### 通用命名原则
 
-- All type names should be `CamelCase`.
-- All struct names should be `CamelCase`.
-- All module names should be `CamelCase`.
-- All function names should be `snake_case` (all lowercase).
-- All variable names should be `snake_case` (all lowercase).
-- All constant names should be `SNAKE_CASE` (all uppercase).
-- All abstract type names should begin with `Abstract`.
-- All type variable names should be a single capital letter, preferably related to the value being typed.
-- Whole words are usually better than abbreviations or single letters.
-- Variables meant to be internal or private to a package should be denoted by prepending two underscores, i.e. `__`.
-- Single letters can be okay when naming a mathematical entity, i.e. an entity whose purpose or non-mathematical "meaning" is likely only known by downstream callers. For example, `a` and `b` would be appropriate names when implementing `*(a::AbstractMatrix, b::AbstractMatrix)`, since the "meaning" of those arguments (beyond their mathematical meaning as matrices, which is already described by the type) is only known by the caller.
-- Unicode is fine within code where it increases legibility, but in no case should Unicode be used in public APIs.
-  This is to allow support for terminals that cannot use Unicode: if a keyword argument must be η, then it can be
-  exclusionary to uses on clusters which do not support Unicode inputs.
+- 类型名称应该使用 `驼峰式命名法`。
+- 结构名称应该使用 `驼峰式命名法`。
+- 模块名称应该使用 `驼峰式命名法`。
+- 函数名称应该使用 `蛇形命名法`（全部小写）。
+- 变量名称应该使用 `蛇形命名法`（全部小写）。
+- 常量名称应该使用 `蛇形命名法`（全部大写）。
+- 抽象类型名称应该以 `Abstract` 开头。
+- 所有类型变量名称应该以唯一的大写字母开头，且根据语义化命名。
+- 优先使用完整的单词而不是它的缩写。
+- 用于表示包内部或私有的变量应该以两个下划线作为前缀，即 `__`。
+- 在为数学实体（Mathematical Entity）命名时，可以使用单个字母，因为该实体的目的和意义只有下游调用者才知道。例如，在实现 `*(a::AbstractMatrix, b::AbstractMatrix)` 时，名称 `a` 和 `b` 都是合适的，因为这些参数的“含义”（除了作为已经由类型描述的矩阵的数学含义），只有调用者知道。
+- 可以在代码中使用 Unicode 来提高可读性，但在任何情况下，都不应该在公共 API 中使用 Unicode。这是为了支持无法使用 Unicode 的终端而设定的：如果一个关键字参数必须是 η，那么在不支持 Unicode 输入的集群上使用它可能会被忽略。
 
-### Comments
+### 注释
 
-- `TODO` to mark todo comments and `XXX` to mark comments about currently broken code
-- Quote code in comments using backticks (e.g. `` `variable_name` ``).
-- When possible, code should be changed to incorporate information that would have been in
-  a comment. For example, instead of commenting `# fx applies the effects to a tree`, simply
-  change the function and variable names `apply_effects(tree)`.
-- Comments referring to Github issues and PRs should add the URL in the comments.
-  Only use inline comments if they fit within the line length limit. If your comment
-  cannot be fitted inline, then place the comment above the content to which it refers:
+- 使用 `TODO` 来标记待办注释，使用 `XXX` 来标记对当前有问题代码的注释。
+- 在注释中使用反引号（例如，`` `variable_name` ``）引用代码。
+- 考虑使用代码本身来体现一些原本应该在注释里体现的信息（语义化）。例如，比起使用 `# fx applies the effects to a tree`，仅仅把函数名改为 `apply_effects(tree)` 就足够了。
+- 指向 GitHub issues 和 PRs 的注释应该包含对应的 URL。只有当行内注释符合行长度限制时才可以使用行内注释。如果你的注释无法放在一行内，那么将注释放置在所涉及内容的上方：
 
 ```julia
 # Yes:
@@ -421,14 +297,13 @@ p = 1  # Number of nodes to predict. Again, an issue with the workflow order. Sh
 # updated after data is fetched.
 ```
 
-- In general, comments above a line of code or function are preferred to inline comments.
+- 一般而言，我们更倾向于将注释放置在代码行或函数之上，而不使用行内注释。
 
-### Modules
+### 模块
 
-- Module imports should occur at the top of a file or right after a `module` declaration.
-- Module imports in packages should either use `import` or explicitly declare the imported functionality, for example
-  `using Dates: Year, Month, Week, Day, Hour, Minute, Second, Millisecond`.
-- Import and using statements should be separated, and should be divided by a blank line.
+- 模块应该在文件的开头或在一个 `module` 的定义后导入。
+- 在包中，模块导入应该使用 `import` 关键字或明确声明导入的功能，例如 `using Dates: Year, Month, Week, Day, Hour, Minute, Second, Millisecond`。
+- `import` 和 `using` 语句应该分开，并用一个空行分隔。
 
 ```julia
 # Yes:
@@ -445,7 +320,7 @@ import C
 using D: d
 ```
 
-- Large sets of imports are preferred to be written in space filling lines separated by commas.
+- 大量的导入项应该在行内使用逗号分隔进行导入。
 
 ```julia
 # Yes:
@@ -464,20 +339,14 @@ using A,
       D
 ```
 
-- Exported variables should be considered part of the public API, and changing their interface constitutes a
-  breaking change.
-- Any exported variables should be sufficiently unique. I.e., do not export `f` as that is very likely to clash with
-  something else.
-- A file that includes the definition of a module, should not include any other code that runs outside that module.
-  i.e. the module should be declared at the top of the file with the `module` keyword and `end` at the bottom of the file.
-  No other code before, or after (except for module docstring before).
-  In this case, the code within the module block should **not** be indented.
-- Sometimes, e.g. for tests, or for namespacing an enumeration, it *is* desirable to declare a submodule midway through a file.
-  In this case, the code within the submodule **should** be indented.
+- 导出的变量应该被视为公共 API 的一部分，改变它们的接口将被视为破坏性改动。
+- 任何导出变量都应该是唯一的。换句话说，不要导出诸如 `f` 这样的名称，这很可能与其他代码发生冲突。
+- 包含模块定义的文件不应包含任何在该模块之外运行的代码。也就是说，该模块应在文件开始使用关键字 `module` 声明，并在文件底部使用 `end` 结尾。除可能存在的模块之前的文档字符外，模块的前后不应该有其他代码。在这种情况下，模块的块内代码**不**应该缩进。
+- 某些时候出于测试或为了给枚举命名空间，需要在文件的中部声明一个子模块。在这种情况下，模块的块内代码**应该**缩进。
 
-### Functions
+### 函数
 
-- Only use short-form function definitions when they fit on a single line:
+- 当函数适合写在一行内时使用短函数（Short-form Function）形式。
 
 ```julia
 # Yes:
@@ -489,34 +358,14 @@ foobar(array_data::AbstractArray{T}, item::T) where {T <: Int64} = T[
 ]
 ```
 
-- Inputs should be required unless a default is historically expected or likely to be applicable to >95% of use cases.
-  For example, the tolerance of a differential equation solver was set to a default of `abstol=1e-6,reltol=1e-3` as a
-  generally correct plot in most cases, and is an expectation from back in the 90's. In that case, using the historically
-  expected and most often useful default tolerances is justified. However, if one implements `GradientDescent`, the learning
-  rate needs to be adjusted for each application (based on the size of the gradient), and thus a default of
-  `GradientDescent(learning_rate = 1)` is not recommended.
-- Arguments that do not have defaults should preferably be made into positional arguments. The newer syntax of required
-  keyword arguments can be useful, but should not be abused. Notable exceptions are cases where "either or" arguments are
-  accepted, for example, if defining `g` or `dgdu` is sufficient, then making them both keyword arguments with `= nothing`
-  and checking that either is not `nothing` (and throwing an appropriate error) is recommended if distinct dispatches with
-  different types is not possible. 
-- When calling a function, always separate your keyword arguments from your positional arguments with a semicolon.
-  This avoids mistakes in ambiguous cases (such as splatting a Dict).
-- When writing a function that sends a lot of keyword arguments to another function, say sending keyword arguments to a
-  differential equation solver, use a named tuple keyword argument instead of splatting the keyword arguments. For example,
-  use `diffeq_solver_kwargs = (; abstol=1e-6, reltol=1e-6,)` as the API and use `solve(prob, alg; diffeq_solver_kwargs...)`
-  instead of splatting all keyword arguments.
-- Functions that mutate arguments should be appended with `!`.
-- [Avoid type piracy](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy). I.e., do not add methods
-  to functions you don't own on types you don't own. Either own the types or the function.
-- Functions should prefer instances instead of types for arguments. For example, for a solver type `Tsit5`, the interface
-  should use `solve(prob,Tsit5())`, not `solve(prob,Tsit5)`. The reason for this is multifold. For one, passing a type
-  has different specialization rules, so functionality can be slower unless `::Type{Tsit5}` is written in the dispatches
-  that use it. Secondly, this allows for default and keyword arguments to extend the choices, which may become useful
-  for some types down the line. Using this form allows for adding more options in a non-breaking manner.
-- If the number of arguments is too large to fit into a 92 character line, then use as many arguments as possible within
-  a line and start each new row with the same indentation, preferably at the same column as the `(` but this can be moved
-  left if the function name is very long. For example:
+- 函数应该要求输入参数，除非提供历史上广受认可的默认值，或确保默认值在 > 95% 的情况下都是合适的。例如，大多数情况下，微分方程求解器的容差默认值为 `abstol=1e-6、reltol=1e-3`，这样的参数绘制出来的图形是正确的，而且这些参数从 90 年代开始就被普遍认可。在这种情况下，使用历史认可、或最常用的值作为默认值是合理的。然而，如果想要实现 `GradientDescent`（梯度下降）算法，则学习率（Learning Rate）需要根据每个应用程序进行调整（基于梯度的大小），因此不建议使用默认值，如 `GradientDescent(learning_rate = 1)`。
+- 没有默认值的参数应该被作为位置参数。需求关键字参数的较新语法可能很有用，但不应被滥用。但有一个特殊情况是接受“非此即彼”参数的情况，例如，如果定义 `g` 或 `dgdu` 的其中一个参数就足够了，那么如果无法使用不同类型的不同调度，则建议将它们都设为 `= nothing` 的关键字参数，然后检查其中哪个参数不是 `nothing`（并抛出适当的错误）。
+- 在调用函数时，始终使用一个分号将关键字参数和位置参数分隔开。这样做可以避免在模棱两可的情况下出错（如对 Dict 进行集合解包（splatting））。
+- 当编写一个向另一个函数发送大量关键字参数的函数时，比如向微分方程求解器发送关键字参数，应该使用命名元组关键字参数，而不是展开关键字参数。例如，使用 `diffeq_solver_kwargs = (; abstol=1e-6, reltol=1e-6,)` 作为 API，并使用 `solve(prob, alg; diffeq_solver_kwargs...)` 而不是对所有关键字参数使用集合解包。
+- 修改参数的函数，其名称应该以 `!` 结尾。
+- [避免类型盗用。](https://docs.julialang.org/en/v1/manual/style-guide/#Avoid-type-piracy) 也就是说，不要在不拥有的类型上向不拥有的函数添加方法。要么拥有类型，要么拥有函数。
+- 函数应优先使用实例而不是类型作为参数。例如，对于求解器类型 `Tsit5`，接口应该使用 `solve(prob, Tsit5())`，而不是` solve(prob, Tsit5)`。这么做是有多方面的原因的。首先，一个类型的传递有不同的特化规则，因此，除非在使用它的分派中写入`::Type{Tsit5}`，否则它的运行速度可能会比较慢。其次，这样做可以利用默认参数和关键字参数来扩展选择，这可能对以后的某些类型有用。使用这种格式可以持续不断为方式添加更多选项。
+- 如果参数数量太多，在一行内超过了 92 个字符，那么尽可能在一行内使用尽可能多的参数，并在每一行的开头保持相同的缩进，最好与 `(` 处的列对齐，但如果函数名特别长，则可以向左移动。例如：
 
 ```julia
 # Yes
@@ -536,89 +385,52 @@ function my_large_function(argument1,
 ```
 
 
-### Function Argument Precedence
+### 函数参数优先级
 
-1. **Function argument**.
-   Putting a function argument first permits the use of [`do`](https://docs.julialang.org/en/v1/base/base/#do) blocks for passing
-   multiline anonymous functions.
+1. **函数参数**。将函数参数放在首位，允许使用 [`do`](https://docs.julialang.org/en/v1/base/base/#do) 块来传递多行匿名函数。
 
-2. **I/O stream**.
-   Specifying the `IO` object first permits passing the function to functions such as
-   [`sprint`](https://docs.julialang.org/en/v1/base/io-network/#Base.sprint), e.g. `sprint(show, x)`.
+2. **I/O 流**。指定 `IO` 对象允许首先将函数传递给 [`sprint`](https://docs.julialang.org/en/v1/base/io-network/#Base.sprint) 等函数，例如 `sprint(show, x)`。
 
-3. **Input being mutated**.
-   For example, in [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!), `x` is the object being mutated and it
-   appears before the value to be inserted into `x`.
+3. **将被修改的输入**。例如，在 [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!) 中，`x` 是被修改的对象，而且在要插入到 `x` 中的值之前出现。
 
-4. **Type**.
-   Passing a type typically means that the output will have the given type.
-   In [`parse(Int, "1")`](https://docs.julialang.org/en/v1/base/numbers/#Base.parse), the type comes before the string to parse.
-   There are many such examples where the type appears first, but it's useful to note that
-   in [`read(io, String)`](https://docs.julialang.org/en/v1/base/io-network/#Base.read), the `IO` argument appears before the type, which is
-   in keeping with the order outlined here.
+4. **类型**。传入何种类型通常意味着函数将输出何种类型。在 [`parse(Int, "1")`](https://docs.julialang.org/en/v1/base/numbers/#Base.parse) 中，类型应位于要解析的字符串之前。类型在出现最前方的例子有很多，不过需要注意的是，在 [`read(io, String)`](https://docs.julialang.org/en/v1/base/io-network/#Base.read) 中，`IO` 参数出现在类型之前，这与本段概述的优先级顺序一致。
 
-5. **Input not being mutated**.
-   In `fill!(x, v)`, `v` is *not* being mutated and it comes after `x`.
+5. **不将被修改的输入**。在 `fill!(x, v)` 中，`v` 在 `x` 之后，并且 <0>v</0> 是 *不* 被改变的。
 
-6. **Key**.
-   For associative collections, this is the key of the key-value pair(s).
-   For other indexed collections, this is the index.
+6. **Key**。对于关联集合，这是键值对的键。对于其他索引集合，这是索引。
 
-7. **Value**.
-   For associative collections, this is the value of the key-value pair(s).
-   In cases like [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!), this is `v`.
+7. **Value**。对于关联集合，这是键值对的值。在类似 [`fill!(x, v)`](https://docs.julialang.org/en/v1/base/arrays/#Base.fill!) 这样的情况下，这是 `v`。
 
-8. **Everything else**.
-   Any other arguments.
+8. **其他一切**。任何其他参数。
 
-9. **Varargs**.
-   This refers to arguments that can be listed indefinitely at the end of a function call.
-   For example, in `Matrix{T}(undef, dims)`, the dimensions can be given as a
-   [`Tuple`](https://docs.julialang.org/en/v1/base/base/#Core.Tuple), e.g. `Matrix{T}(undef, (1,2))`, or as [`Vararg`](https://docs.julialang.org/en/v1/base/base/#Core.Vararg)s,
-   e.g. `Matrix{T}(undef, 1, 2)`.
+9. **可变参数**。这是指可以在函数调用的末尾无限列举的参数。例如，在 `Matrix{T}(undef, dims)` 中，维度可以作为一个[`元组`](https://docs.julialang.org/en/v1/base/base/#Core.Tuple)存在，例如 `Matrix{T}(undef, (1,2))`，或者作为一个[`变参（元组）`](https://docs.julialang.org/en/v1/base/base/#Core.Vararg)存在，例如 `Matrix{T}(undef, 1, 2)`。
 
-10. **Keyword arguments**.
-   In Julia keyword arguments have to come last anyway in function definitions; they're
-   listed here for the sake of completeness.
+10. **关键字参数**。在Julia中，关键字参数无论如何都必须在函数定义的最后；它们在这里列出是为了完整起见。
 
-The vast majority of functions will not take every kind of argument listed above; the
-numbers merely denote the precedence that should be used for any applicable arguments
-to a function.
+绝大多数函数不会使用上述列出的所有种类的参数；数字只是表示应该用于函数的任何适用参数的优先级。
 
-### Tests and Continuous Integration
+### 测试与持续集成
 
-- The high level `runtests.jl` file should only be used to shuttle to other test files.
-- Every set of tests should be included into a [`@safetestset`](https://github.com/YingboMa/SafeTestsets.jl).
-  A standard `@testset` does not fully enclose all defined values, such as functions defined in a `@testset`, and
-  thus can "leak".
-- Test includes should be written in one line, for example:
+- 高层级的 `runtests.jl` 文件只应该用于切换到其他不同测试文件。
+- 每一组测试都应该包含在[`@safetestset`](https://github.com/YingboMa/SafeTestsets.jl)中。标准的`@testset`不能完全包含所有定义的值，例如在`@testset`中定义的函数，可能会因此导致"泄漏"。
+- 测试用的 include 应该写在一行中，例如：
 
 ```julia
 @time @safetestset "Jacobian Tests" include("interface/jacobian_tests.jl")
 ```
 
-- Every test script should be fully reproducible in isolation. I.e., one should be able to copy paste that script
-  and receive the results.
-- Test scripts should be grouped based on categories, for example tests of the interface vs tests for numerical
-  convergence. Grouped tests should be kept in the same folder.
-- A `GROUP` environment variable should be used to specify test groups for parallel testing in continuous integration.
-  A fallback group `All` should be used to specify all the tests that should be run when a developer runs `]test Package`
-  locally. As an example, see the
-  [OrdinaryDiffEq.jl test structure](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)
-- Tests should include downstream tests to major packages which use the functionality, to ensure continued support.
-  Any update that breaks the downstream tests should follow with a notification to the downstream package of why the
-  support was broken (preferably in the form of a PR that fixes support), and the package should be given a major
-  version bump in the next release if the changed functionality was part of the public API.
-- CI scripts should use the default settings unless required.
-- CI scripts should test the Long-Term Support (LTS) release and the current stable release. Nightly tests are only
-  necessary for packages with a heavy reliance on specific compiler details.
-- Any package supporting GPUs should include continuous integration for GPUs.
-- [Doctests](https://juliadocs.github.io/Documenter.jl/stable/man/doctests/) should be enabled except for the examples
-  that are computationally-prohibitive to have as part of continuous integration.
+- 每个测试脚本都应该是可以独立运行并且结果完全可复现的。也就是说，能够复制该脚本并得到相同结果。
+- 测试脚本应根据类别进行分组，例如接口测试与数值收敛测试各为一组。分组后的测试脚本应该保存在同一个文件夹中。
+- `GROUP` 环境变量应该被用来指定在持续集成中进行并行测试的测试组。当开发人员在本地运行 `]test Package` 时，应有一个回退组 `All` 来指定所有应该被运行的测试。可以参考 [OrdinaryDiffEq.jl 的测试结构](https://github.com/SciML/OrdinaryDiffEq.jl/blob/v6.10.0/test/runtests.jl)来作为案例。
+- 测试应该包括对使用该功能的下游主要软件包的测试，以确保持续支持下游软件包。任何破坏下游测试的更新都应向下游软件包发出通知，说明支持被破坏的原因（最好以修复支持的PR的形式），如果更改的功能是公共API的一部分，则应在下一版本中对软件包进行重大版本升级。
+- 配置信息脚本应该使用默认配置，除非有特殊需求。
+- CI脚本应该测试长期支持（LTS）版本和当前稳定版本。每夜测试仅对特定编译器细节有严重依赖的软件包才是必要的。
+- 任何支持 GPU 的软件包都应该包含针对 GPU 的持续集成。
+- 应该启用[文档测试](https://juliadocs.github.io/Documenter.jl/stable/man/doctests/)，除了那些由于计算上的限制而不能作为持续集成的一部分的示例。
 
-### Whitespace
+### 空格
 
-- Avoid extraneous whitespace immediately inside parentheses, square brackets or braces.
+- 避免在括号、方括号或大括号的内部出现多余的空格。
 
     ```julia
     # Yes:
@@ -628,17 +440,17 @@ to a function.
     spam( ham[ 1 ], [ eggs ] )
     ```
 
-- Avoid extraneous whitespace immediately before a comma or semicolon:
+- 避免在逗号或分号之前加入多余的空格：
 
     ```julia
     # Yes:
-    if x == 4 @show(x, y); x, y = y, x end
+    spam(ham[1], [eggs])
 
     # No:
-    if x == 4 @show(x , y) ; x , y = y , x end
+    spam( ham[ 1 ], [ eggs ] )
     ```
 
-- Avoid whitespace around `:` in ranges. Use brackets to clarify expressions on either side.
+- 避免在范围 `:` 周围留有空格。使用括号来明确任何一侧的表述。
 
     ```julia
     # Yes:
@@ -657,7 +469,7 @@ to a function.
     ham[lower + offset:upper + offset]  # Avoid as it is easy to read as `ham[lower + (offset:upper) + offset]`
     ```
 
-- Avoid using more than one space around an assignment (or other) operator to align it with another:
+- 避免在赋值（或其他）操作符周围使用多个空格以将其与其他操作符对齐：
 
     ```julia
     # Yes:
@@ -671,7 +483,7 @@ to a function.
     long_variable = 3
     ```
 
-- Surround most binary operators with a single space on either side: assignment (`=`), [updating operators](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Updating-operators-1) (`+=`, `-=`, etc.), [numeric comparisons operators](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Numeric-Comparisons-1) (`==`, `<`, `>`, `!=`, etc.), [lambda operator](https://docs.julialang.org/en/v1/manual/functions/#man-anonymous-functions-1) (`->`). Binary operators may be excluded from this guideline include: the [range operator](https://docs.julialang.org/en/v1/base/math/#Base.::) (`:`), [rational operator](https://docs.julialang.org/en/v1/base/math/#Base.://) (`//`), [exponentiation operator](https://docs.julialang.org/en/v1/base/math/#Base.:^-Tuple{Number,%20Number}) (`^`), [optional arguments/keywords](https://docs.julialang.org/en/v1/manual/functions/#Optional-Arguments-1) (e.g. `f(x = 1; y = 2)`).
+- 在大多数二进制运算符的两侧加上一个空格：赋值运算符（`=`），[更新运算符](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Updating-operators-1)（`+=`，`-=` 等），[数值比较运算符](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Numeric-Comparisons-1)（`==`，`<`，`>`，`!=` 等），[lambda 运算符](https://docs.julialang.org/en/v1/manual/functions/#man-anonymous-functions-1)（`->`）。不包括以下二元运算符： [范围运算符 ](https://docs.julialang.org/en/v1/base/math/#Base.::)（`:`）、 [有理数运算符](https://docs.julialang.org/en/v1/base/math/#Base.://) （`//`）、[指数运算符](https://docs.julialang.org/en/v1/base/math/#Base.:^-Tuple{Number,%20Number})（`^`）以及[可选参数/关键字](https://docs.julialang.org/en/v1/manual/functions/#Optional-Arguments-1)（例如 `f(x = 1; y = 2)`）。请勿将这些运算符包含在本准则中。
 
     ```julia
     # Yes:
@@ -685,7 +497,7 @@ to a function.
     x^2<y
     ```
 
-- Avoid using whitespace between unary operands and the expression:
+- 避免在一元操作数和表达式之间使用空格：
 
     ```julia
     # Yes:
@@ -697,8 +509,7 @@ to a function.
     [1 0 - 1]  # Note: evaluates to `[1 -1]`
     ```
 
-- Avoid extraneous empty lines. Avoid empty lines between single line method definitions
-    and otherwise separate functions with one empty line, plus a comment if required:
+- 避免多余的空行。避免在单行方法定义之间留空行，而在其他独立的函数之间使用一个空行分隔，如果需要的话，可以加上注释。
 
     ```julia
     # Yes:
@@ -726,10 +537,7 @@ to a function.
     dophilosophy() = "Why?"
     ```
 
-- Function calls that cannot fit on a single line within the line limit should be broken up such that the lines containing the opening and closing brackets are indented to the same level while the parameters of the function are indented one level further.
-  In most cases, the arguments and/or keywords should each be placed on separate lines.
-  Note that this rule conflicts with the typical Julia convention of indenting the next line to align with the open bracket in which the parameter is contained.
-  If working in a package with a different convention, follow the convention used in the package over using this guideline.
+- 超过单行字符限制的函数调用应该被分成多行，以使包含左括号和右括号的行具有相同的缩进，而函数的参数则再缩进一级。在大多数情况下，每个参数和/或关键字应该分别放在不同的行上。请注意，这个规则与 Julia 的典型约定冲突，即，与缩进下一行以与包含参数的开放括号对齐这一点冲突。如果你为具有不同规约的程序包编写代码，请遵循软件包中使用的规约，而不是使用本指南。
 
     ```julia
     # Yes:
@@ -748,7 +556,7 @@ to a function.
                              unique_conic_forms)
     ```
 
-- Group similar one line statements together.
+- 将类似的单行语句分组在一起。
 
     ```julia
     # Yes:
@@ -764,7 +572,7 @@ to a function.
     baz = 3
     ```
 
-- Use blank-lines to separate different multi-line blocks.
+- 请使用空行分隔不同的多行文本块。
 
     ```julia
     # Yes:
@@ -784,7 +592,7 @@ to a function.
         println(i)
     end
     ```
-- After a function definition, and before an end statement do not include a blank line.
+- 定义完一个函数后，请不要在结束语句前添加空行。
 
     ```julia
     # Yes:
@@ -805,7 +613,7 @@ to a function.
     end
     ```
 
-- Use line breaks between control flow statements and returns.
+- 在控制流语句和返回语句之间使用换行符。
 
     ```julia
     # Yes:
@@ -826,11 +634,9 @@ to a function.
     end
     ```
 
-### NamedTuples
+### 命名元组
 
-The `=` character in `NamedTuple`s should be spaced as in keyword arguments.
-Space should be put between the name and its value.
-The empty `NamedTuple` should be written `NamedTuple()` not `(;)`
+在 `NamedTuple` 中，`=` 字符应该像关键字参数一样有空格。参数名称与其值之间应该留空格。空 `NamedTuple` 应该写入 `NamedTuple()` 而不是 `(;)`
 
 ```julia
 # Yes:
@@ -843,9 +649,9 @@ xy = (x=1, y=2)
 xy = (;x=1,y=2)
 ```
 
-### Numbers
+### 数值
 
-- Floating-point numbers should always include a leading and/or trailing zero:
+- 浮点数应始终写出小数点前面和/或后面的零：
 
 ```julia
 # Yes:
@@ -859,27 +665,22 @@ xy = (;x=1,y=2)
 3.f0
 ```
 
-- Always prefer the type `Int` to `Int32` or `Int64` unless one has a specific reason
-  to choose the bit size.
+- 始终优先选择类型 `Int` 而不是 `Int32` 或 `Int64`，除非有特定原因需要选择位大小。
 
-### Ternary Operator
+### 三元操作符
 
-Ternary operators (`?:`) should generally only consume a single line.
-Do not chain multiple ternary operators.
-If chaining many conditions, consider using an `if`-`elseif`-`else` conditional, dispatch, or a dictionary.
+三元运算符（`?:`）通常只应占一行。不要连续嵌套多个三元运算符。如果连续嵌套了多个三元操作符，请考虑使用类似 `if`-`elseif`-`else` 这样的条件语句、派发或是字典。
 
 ```julia
 # Yes:
-foobar = foo == 2 ? bar : baz
-
-# No:
+foobar = foo == 2 ? # Yes:
 foobar = foo == 2 ?
     bar :
     baz
 foobar = foo == 2 ? bar : foo == 3 ? qux : baz
 ```
 
-As an alternative, you can use a compound boolean expression:
+还有一种替代方案，你可以使用复合布尔表达式：
 
 ```julia
 # Yes:
@@ -898,10 +699,9 @@ else
 end
 ```
 
-### For loops
+### For 循环
 
-For loops should always use `in`, never `=` or `∈`.
-This also applies to list and generator comprehensions
+循环应该始终使用 `in`，而不是 `=` 或 `∈`。这也适用于列表和生成器推导式。
 
 ```julia
 # Yes
@@ -919,9 +719,9 @@ end
 [foo(x) for x ∈ xs]
 ```
 
-### Function Type Annotations
+### 函数类型标注
 
-Annotations for function definitions should be as general as possible.
+函数定义的类型标注应尽可能通用。
 
 ```julia
 # Yes:
@@ -931,7 +731,7 @@ splicer(arr::AbstractArray, step::Integer) = arr[begin:step:end]
 splicer(arr::Array{Int}, step::Int) = arr[begin:step:end]
 ```
 
-Using as many generic types as possible allows for a variety of inputs and allows your code to be more general:
+尽可能使用尽可能多的通用类型，使函数可以允许多种输入，并使您的代码更加通用：
 
 ```julia
 julia> splicer(1:10, 2)
@@ -943,11 +743,9 @@ julia> splicer([3.0, 5, 7, 9], 2)
  7.0
 ```
 
-### Struct Type Annotations
+### 结构类型标注
 
-Annotations on type fields need to be given a little more thought, since field access is not concrete unless
-the compiler can infer the type (see [type-dispatch design](https://www.stochasticlifestyle.com/type-dispatch-design-post-object-oriented-programming-julia/) for details). Since well-inferred code is
-preferred, abstract type annotations, i.e.
+对类型字段的标注需要更加深思熟虑，因为除非编译器可以推断出类型，否则字段访问是不确定的（有关详细信息，请参见[类型调度设计](https://www.stochasticlifestyle.com/type-dispatch-design-post-object-oriented-programming-julia/)）。由于易于推断的代码是首选，因此抽象类型标注，即。
 
 ```julia
 mutable struct MySubString <: AbstractString
@@ -957,7 +755,7 @@ mutable struct MySubString <: AbstractString
 end
 ```
 
-are not recommended. Instead a concretely-typed struct:
+是不推荐的。相反，使用具体类型的结构体：
 
 ```julia
 mutable struct MySubString <: AbstractString
@@ -967,7 +765,7 @@ mutable struct MySubString <: AbstractString
 end
 ```
 
-is preferred. If generality is required, then parametric typing is preferred, i.e.:
+是推荐的。如果需要保持通用性，则首选参数化类型，如：
 
 ```julia
 mutable struct MySubString{T<:Integer} <: AbstractString
@@ -977,7 +775,7 @@ mutable struct MySubString{T<:Integer} <: AbstractString
 end
 ```
 
-Untyped fields should be explicitly typed `Any`, i.e.:
+未指定类型的字段应明确指定为 `Any`，即：
 
 ```julia
 struct StructA
@@ -985,9 +783,9 @@ struct StructA
 end
 ```
 
-### Macros
+### 宏
 
-- Do not add spaces between assignments when there are multiple assignments.
+- 在有多个赋值时不要在赋值之间加上空格。
 
 ```julia
 Yes:
@@ -998,19 +796,16 @@ No:
 @parameters a = b c = d
 ```
 
-### Types and Type Annotations
+### 类型与类型标记
 
-- Avoid elaborate union types. `Vector{Union{Int,AbstractString,Tuple,Array}}` should probably
-  be `Vector{Any}`. This will reduce the amount of extra strain on compilation checking many
-  branches.
-- Unions should be kept to two or three types only for branch splitting. Unions of three types
-  should be kept to a minimum for compile times.
-- Do not use `===` to compare types. Use `isa` or `<:` instead.
+- 避免使用复杂的 union 类型。`Vector{Union{Int,AbstractString,Tuple,Array}}` 应该改为 `Vector{Any}`。这将减少编译检查过多分支时造成的额外压力。
+- 分支拆分时，应只保留两到三种类型的 Unions. 只有三种类型的 Unions 一般能将编译时间减少到最小。
+- 不要使用 `===` 来比较类型。请使用 `isa` 或 `<:` 来替代。
 
-### Package version specifications
+### 软件包版本规范
 
-- Use [Semantic Versioning](https://semver.org/)
-- For simplicity, avoid including the default caret specifier when specifying package version requirements.
+- 使用[语义化版本控制](https://semver.org/)
+- 为了简洁起见，在指定软件包依赖版本时避免写入默认的插入符号。
 
 ```julia
 # Yes:
@@ -1020,38 +815,29 @@ DataFrames = "0.17"
 DataFrames = "^0.17"
 ```
 
-- For accuracy, do not use constructs like `>=` to avoid upper bounds.
-- Every dependency should have a bound.
-- All packages should use [CompatHelper](https://github.com/JuliaRegistries/CompatHelper.jl) and attempt to
-  stay up to date with the dependencies.
-- The lower bound on dependencies should be the last tested version.
+- 为了保证准确性，请不要使用诸如 `>=` 之类的结构来限制版本号。
+- 每个依赖都应该有版本锁定。
+- 所有包都应该使用 [CompatHelper](https://github.com/JuliaRegistries/CompatHelper.jl) 并始终尝试使用依赖的最新版本。
+- 依赖关系的下限应该是最后的测试版本。
 
-### Documentation
+### 文档
 
-- Documentation should always attempt to be at the highest level possible. I.e., documentation of an interface that
-  all methods follow is preferred to documenting every method, and documenting the interface of an abstract type is
-  preferred to documenting all the subtypes individually. All instances should then refer to the higher level
-  documentation.
-- Documentation should use [Documenter.jl](https://juliadocs.github.io/Documenter.jl/stable/).
-- Tutorials should come before reference materials.
-- Every package should have a starting tutorial that covers "the 90% use case", i.e. the ways that most people will
-  want to use the package.
-- The tutorial should show a complete workflow and be opinionated about said workflow. For example, when writing a tutorial
-  about a simulator, pick a plotting package and show how to plot it.
-- Variable names in tutorials are important. If you use `u0`, then all other codes will copy that naming scheme.
-  Show potential users the right way to use your code with the right naming.
-- When applicable, tutorials on how to use the "high performance advanced features" should be separated from the beginning tutorial.
-- All documentation should summarize the contents before going into specifics of API docstrings.
-- Most modules, types and functions should have [docstrings](http://docs.julialang.org/en/v1/manual/documentation/).
-- Prefer documenting accessor functions instead of fields when possible. Documented fields are part of the public API
-  and changing their contents/name constitutes a breaking change.
-- Only exported functions are required to be documented.
-- Avoid documenting commonly overloaded methods, such as `==`.
-- Try to document a function and not individual methods where possible, as typically all methods will have similar docstrings.
-- If you are adding a method to a function that already has a docstring only add a docstring if the
-  behavior of your function deviates from the existing docstring.
-- Docstrings are written in [Markdown](https://en.wikipedia.org/wiki/Markdown) and should be concise.
-- Docstring lines should be wrapped at 92 characters.
+- 文档应始终尽量在最高级编写。换言之，倾向于编写一个适用于所有方法的接口文档，而不是为每个方法都编写文档，倾向于为抽象类型编写接口文档，而不是为每个子类型都编写文档。所有实例应该指向更高层级的文档。
+- 文档应该使用 [Document.jl](https://juliadocs.github.io/Documenter.jl/stable/)  来构建。
+- 教程应该写在参考材料之前。
+- 每个包都应该有一个入门教程，并且能够涵盖“90%的用例”，即包含大多数人会想要使用包的方式。
+- 教程应该展示一个完整的工作流，并明确写出该工作流选择使用什么并如何操作。例如，当撰写一个关于仿真器的教程时，应该明确指出使用哪个绘图包并展示如何用其进行绘图。
+- 教程中的变量名很重要。如果您使用 `u0`，那么所有其他代码都应使用相同的命名。好向潜在用户展示如何以正确的命名方式正确的使用您的代码。
+- 若情况合适，如何使用“高性能高级功能”的教程应该与入门教程分开。
+- 在开始描述 API 文档字符串的具体细节之前，所有文档都应该总结其内容。
+- 大多数模块、类型和函数应该编写[文档字符串](http://docs.julialang.org/en/v1/manual/documentation/)。
+- 文档应尽可能提供访问函数而不是相关字段的链接。文档化后的字段是公共 API 的一部分，更改其内容/名称将构成破坏性更改。
+- 只有导出的函数才需要进行文档化。
+- 避免编写常常被重载的方法，例如 `==`。
+- 尽量在可能的情况下为一个函数而不是单独的方法编写文档，因为通常所有的方法都会有相似的文档字符串。
+- 如果您正在为已经有文档字符串的函数添加一个方法，只有在您的函数行为与现有的文档字符串不一致时，才添加一个新的文档字符串。
+- 文档字符串应使用 [Markdown](https://en.wikipedia.org/wiki/Markdown) 语法编写，且内容需简明扼要。
+- 文档字符串的单行长度不超过92个字符。
 
 ```julia
 """
@@ -1063,11 +849,11 @@ all pairs of columns of `x`.
 function bar(x, y) ...
 ```
 
-- It is recommended that you have a blank line between the headings and the content when the content is of sufficient length.
-- Try to be consistent within a docstring whether you use this additional whitespace.
-- Follow one of the following templates for types and functions when possible:
+- 当内容足太长时，建议在标题和内容之间留出一个空行。
+- 请尝试在文档字符串中保持风格一致，无论您是否使用了这个额外的空格。
+- 尽可能遵循下列模板：
 
-Type Template (should be skipped if it is redundant with the constructor(s) docstring):
+类型模板（如果与构造函数的文档字符串重复则应跳过）：
 
 ```julia
 """
@@ -1085,7 +871,7 @@ struct MyArray{T, N} <: AbstractArray{T, N}
 end
 ```
 
-Function Template (only required for exported functions):
+函数模板（仅适用于导出函数）：
 
 ```julia
 """
@@ -1112,11 +898,9 @@ function mysearch(array::AbstractArray{T}, val::T) where {T}
 end
 ```
 
-- The `@doc doc""" """` formulation from the Markdown standard library should be used whenever
-  there is LaTeX.
-- Only public fields of types must be documented. Undocumented fields are considered non-public internals.
-- If your method contains lots of arguments or keywords, you may want to exclude them from the method
-  signature on the first line and instead use `args...` and/or `kwargs...`.
+- 只要有 LaTeX 语句，就应该使用 Markdown 标准库中的 `@doc doc""" """` 语法。
+- 只能为类型的公共字段编写文档。未编写文档的字段被视为非公开的内部内容。
+- 如果您的方法包含大量的参数或关键字，您可能希望在第一行方法签名中将它们排除在外，换而使用 `args...` 和/或 `kwargs...`。
 
 ```julia
 """
@@ -1137,11 +921,11 @@ A cluster manager which spawns workers.
 - `queue::AbstractString`: ...
 """
 function Manager(...)
-    ...
+    ..
 end
 ```
 
-- Feel free to document multiple methods for a function within the same docstring. Be careful to only do this for functions you have defined.
+- 可以随意的在同一个文档字符串中记录一个函数的多种方法。但请只为你已定义的函数这么做。
 
 ```julia
 """
@@ -1167,8 +951,7 @@ function Manager end
 
 ```
 
-- If the documentation for bullet-point exceeds 92 characters, the line should be wrapped and slightly indented.
-  Avoid aligning the text to the `:`.
+- 如果文档中的项目符号超过92个字符，则应将该行换行并进行缩进。请避免将文字对齐到`：`。
 
 ```julia
 """
@@ -1180,25 +963,22 @@ function Manager end
 """
 ```
 
-### Error Handling
+### 报错处理
 
-- `error("string")` should be avoided. Defining and throwing exception types is preferred. See the
-  [manual on exceptions for more details](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling).
-- Try to avoid `try/catch`. Use it as minimally as possible. Attempt to catch potential issues before running
-  code, not after.
+- `error("string")` 应予避免。尽可能定义和抛出异常类型。请参阅[有关异常的文档，以获取更多详细信息](https://docs.julialang.org/en/v1/manual/control-flow/#Exception-Handling)。
+- 尝试避免使用 `try/catch`。请尽量少用它。应该在运行代码之前就处理好潜在问题。
 
-### Arrays
+### 数组
 
-- Avoid splatting (`...`) whenever possible. Prefer iterators such as `collect`, `vcat`, `hcat`, etc. instead.
+- 尽可能避免使用 splating 语法（`...`）。优先使用迭代器，如 `collect`、 `vcat`、 `hcat` 等。
 
-### Line Endings
+### 行尾
 
-Always use Unix style `\n` line ending.
+总是遵循 Unix 风格，在代码最后一行添加 `\n`。
 
-### VS-Code Settings
+### VS-Code 配置
 
-If you are a user of VS Code we recommend that you have the following options in your Julia syntax specific settings.
-To modify these settings, open your VS Code Settings with <kbd>CMD</kbd>+<kbd>,</kbd> (Mac OS) or <kbd>CTRL</kbd>+<kbd>,</kbd> (other OS), and add to your `settings.json`:
+如果您是VS Code的用户，我们建议您在Julia语法特定设置中使用以下选项。要使用这些设置，请使用快捷键 <kbd>CMD</kbd>+<kbd>,</kbd> （Mac OS）或 <kbd>CTRL</kbd>+<kbd>,</kbd> （其它系统）打开你的 VS Code 设置，然后将以下代码添加至 `settings.json` 中：
 
 ```json
 {
@@ -1214,26 +994,25 @@ To modify these settings, open your VS Code Settings with <kbd>CMD</kbd>+<kbd>,<
     },
 }
 ```
-Additionally, you may find the [Julia VS-Code plugin](https://github.com/julia-vscode/julia-vscode) useful.
+此外，您可能会发现 [Julia VS-Code 拓展](https://github.com/julia-vscode/julia-vscode) 很有用。
 
 ### JuliaFormatter
 
-**Note: the** `sciml` **style is only available in** `JuliaFormatter v1.0` **or later**
+**注意：** `sciml` **风格只在 ** `JuliaFormatter v1.0` **或更高版本中可用**
 
-One can add `.JuliaFormatter.toml` with the content
+添加以下内容到 `.JuliaFormatter.toml`
 ```toml
 style = "sciml"
 ```
-in the root of a repository, and run
+并在仓库根目录下运行
 ```julia
 using JuliaFormatter, SomePackage
 format(joinpath(dirname(pathof(SomePackage)), ".."))
 ```
-to format the package automatically.
+得以自动格式化软件包代码
 
-Add [FormatCheck.yml](https://github.com/SciML/ModelingToolkit.jl/blob/master/.github/workflows/FormatCheck.yml) to enable the formatting CI. The CI will fail if the repository needs additional formatting. Thus, one should run `format` before committing.
+添加 [FormatCheck.yml](https://github.com/SciML/ModelingToolkit.jl/blob/master/.github/workflows/FormatCheck.yml) 来启用 CI 格式化检测。当代码不符合风格规范时，CI 会失败。因此，在提交之前应该先执行 `格式化`。
 
-# References
+# 参考
 
-Many of these style choices were derived from the [Julia style guide](https://docs.julialang.org/en/v1/manual/style-guide/),
-the [YASGuide](https://github.com/jrevels/YASGuide), and the [Blue style guide](https://github.com/invenia/BlueStyle#module-imports).
+本文许多准则参考自 [Julia style guide](https://docs.julialang.org/en/v1/manual/style-guide/)，[YASGuide](https://github.com/jrevels/YASGuide)，以及 [Blue style guide](https://github.com/invenia/BlueStyle#module-imports).
